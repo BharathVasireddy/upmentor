@@ -1,9 +1,9 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { 
-  BarChart3, 
-  ListTodo, 
+import { useState } from 'react'
+import {
+  BarChart3,
+  ListTodo,
   Activity,
   Settings,
   MoreVertical,
@@ -18,22 +18,39 @@ import {
   BookOpen,
   ChevronRight,
   Calendar,
-  TrendingUp
-} from 'lucide-react';
-import WebsiteLayout from '@/components/layout/WebsiteLayout';
+  TrendingUp,
+} from 'lucide-react'
+import WebsiteLayout from '@/components/layout/WebsiteLayout'
 
 export default function DashboardPage() {
   const [tasks, setTasks] = useState([
-    { id: 1, title: 'Complete React Course', subtitle: 'Chapter 5: State Management', completed: false },
-    { id: 2, title: 'Practice DSA Problems', subtitle: 'Arrays and Strings', completed: false },
-    { id: 3, title: 'Prepare for Interview', subtitle: 'Mock interview with mentor', completed: true }
-  ]);
+    {
+      id: 1,
+      title: 'Complete React Course',
+      subtitle: 'Chapter 5: State Management',
+      completed: false,
+    },
+    {
+      id: 2,
+      title: 'Practice DSA Problems',
+      subtitle: 'Arrays and Strings',
+      completed: false,
+    },
+    {
+      id: 3,
+      title: 'Prepare for Interview',
+      subtitle: 'Mock interview with mentor',
+      completed: true,
+    },
+  ])
 
   const toggleTask = (id: number) => {
-    setTasks(tasks.map(task => 
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ));
-  };
+    setTasks(
+      tasks.map(task =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    )
+  }
 
   const projects = [
     {
@@ -44,7 +61,7 @@ export default function DashboardPage() {
       completedSessions: 9,
       nextSession: 'Tomorrow, 4:00 PM',
       mentor: 'Dr. Priya Sharma',
-      subject: 'Physics & Mathematics'
+      subject: 'Physics & Mathematics',
     },
     {
       id: 2,
@@ -54,7 +71,7 @@ export default function DashboardPage() {
       completedSessions: 4,
       nextSession: 'Friday, 6:00 PM',
       mentor: 'Rajesh Kumar',
-      subject: 'Full Stack Development'
+      subject: 'Full Stack Development',
     },
     {
       id: 3,
@@ -64,16 +81,40 @@ export default function DashboardPage() {
       completedSessions: 4,
       nextSession: 'Next Week',
       mentor: 'Anita Desai',
-      subject: 'Career Planning'
-    }
-  ];
+      subject: 'Career Planning',
+    },
+  ]
 
   const stats = [
-    { label: 'Total Sessions', value: '24', icon: Calendar, color: 'text-blue-600', bgColor: 'bg-blue-50' },
-    { label: 'Hours Learned', value: '156', icon: Clock, color: 'text-green-600', bgColor: 'bg-green-50' },
-    { label: 'Goals Achieved', value: '8', icon: Target, color: 'text-purple-600', bgColor: 'bg-purple-50' },
-    { label: 'Avg Rating', value: '4.8', icon: Star, color: 'text-yellow-600', bgColor: 'bg-yellow-50' }
-  ];
+    {
+      label: 'Total Sessions',
+      value: '24',
+      icon: Calendar,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
+    },
+    {
+      label: 'Hours Learned',
+      value: '156',
+      icon: Clock,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50',
+    },
+    {
+      label: 'Goals Achieved',
+      value: '8',
+      icon: Target,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50',
+    },
+    {
+      label: 'Avg Rating',
+      value: '4.8',
+      icon: Star,
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-50',
+    },
+  ]
 
   const upcomingSessions = [
     {
@@ -82,7 +123,7 @@ export default function DashboardPage() {
       subject: 'Physics - Mechanics',
       time: 'Today, 4:00 PM',
       duration: '60 min',
-      type: 'Video Call'
+      type: 'Video Call',
     },
     {
       id: 2,
@@ -90,7 +131,7 @@ export default function DashboardPage() {
       subject: 'React.js Development',
       time: 'Tomorrow, 6:00 PM',
       duration: '90 min',
-      type: 'Screen Share'
+      type: 'Screen Share',
     },
     {
       id: 3,
@@ -98,16 +139,16 @@ export default function DashboardPage() {
       subject: 'Career Planning',
       time: 'Friday, 2:00 PM',
       duration: '45 min',
-      type: 'Discussion'
-    }
-  ];
+      type: 'Discussion',
+    },
+  ]
 
   return (
     <WebsiteLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">
+          <h1 className="mb-2 text-3xl font-bold text-slate-900">
             Good morning, Arjun!
           </h1>
           <p className="text-slate-600">
@@ -116,16 +157,25 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, index) => (
-            <div key={index} className="bg-white p-6 rounded-xl border border-slate-200">
+            <div
+              key={index}
+              className="rounded-xl border border-slate-200 bg-white p-6"
+            >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-600">{stat.label}</p>
-                  <p className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</p>
+                  <p className="text-sm font-medium text-slate-600">
+                    {stat.label}
+                  </p>
+                  <p className="mt-1 text-2xl font-bold text-slate-900">
+                    {stat.value}
+                  </p>
                 </div>
-                <div className={`w-12 h-12 ${stat.bgColor} rounded-lg flex items-center justify-center`}>
-                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                <div
+                  className={`h-12 w-12 ${stat.bgColor} flex items-center justify-center rounded-lg`}
+                >
+                  <stat.icon className={`h-6 w-6 ${stat.color}`} />
                 </div>
               </div>
             </div>
@@ -133,37 +183,45 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Left Column - Projects & Tasks */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="space-y-8 lg:col-span-2">
             {/* Active Projects */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-slate-900">Active Learning Paths</h2>
-                <button className="text-slate-600 hover:text-slate-900 transition-colors">
-                  <MoreVertical className="w-5 h-5" />
+            <div className="rounded-xl border border-slate-200 bg-white p-6">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-slate-900">
+                  Active Learning Paths
+                </h2>
+                <button className="text-slate-600 transition-colors hover:text-slate-900">
+                  <MoreVertical className="h-5 w-5" />
                 </button>
               </div>
               <div className="space-y-4">
-                {projects.map((project) => (
-                  <div key={project.id} className="p-4 bg-slate-50 rounded-lg">
-                    <div className="flex items-start justify-between mb-3">
+                {projects.map(project => (
+                  <div key={project.id} className="rounded-lg bg-slate-50 p-4">
+                    <div className="mb-3 flex items-start justify-between">
                       <div>
-                        <h3 className="font-semibold text-slate-900">{project.title}</h3>
-                        <p className="text-sm text-slate-600">{project.subject}</p>
+                        <h3 className="font-semibold text-slate-900">
+                          {project.title}
+                        </h3>
+                        <p className="text-sm text-slate-600">
+                          {project.subject}
+                        </p>
                       </div>
-                      <span className="text-sm font-medium text-slate-700">{project.progress}%</span>
+                      <span className="text-sm font-medium text-slate-700">
+                        {project.progress}%
+                      </span>
                     </div>
-                    <div className="w-full bg-slate-200 rounded-full h-2 mb-3">
-                      <div 
-                        className="bg-slate-900 h-2 rounded-full transition-all duration-300" 
+                    <div className="mb-3 h-2 w-full rounded-full bg-slate-200">
+                      <div
+                        className="h-2 rounded-full bg-slate-900 transition-all duration-300"
                         style={{ width: `${project.progress}%` }}
                       ></div>
                     </div>
                     <div className="flex items-center justify-between text-sm text-slate-600">
                       <span>Mentor: {project.mentor}</span>
                       <span className="flex items-center">
-                        <Clock className="w-4 h-4 mr-1" />
+                        <Clock className="mr-1 h-4 w-4" />
                         {project.nextSession}
                       </span>
                     </div>
@@ -173,29 +231,36 @@ export default function DashboardPage() {
             </div>
 
             {/* Quick Tasks */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-slate-900">Today's Tasks</h2>
-                <button className="flex items-center text-slate-600 hover:text-slate-900 transition-colors">
-                  <Plus className="w-5 h-5 mr-1" />
+            <div className="rounded-xl border border-slate-200 bg-white p-6">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-slate-900">
+                  Today's Tasks
+                </h2>
+                <button className="flex items-center text-slate-600 transition-colors hover:text-slate-900">
+                  <Plus className="mr-1 h-5 w-5" />
                   Add Task
                 </button>
               </div>
               <div className="space-y-3">
-                {tasks.map((task) => (
-                  <div key={task.id} className="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                {tasks.map(task => (
+                  <div
+                    key={task.id}
+                    className="flex items-center rounded-lg p-3 transition-colors hover:bg-slate-50"
+                  >
                     <button
                       onClick={() => toggleTask(task.id)}
                       className="mr-3 flex-shrink-0"
                     >
                       {task.completed ? (
-                        <CheckCircle2 className="w-5 h-5 text-green-600" />
+                        <CheckCircle2 className="h-5 w-5 text-green-600" />
                       ) : (
-                        <Circle className="w-5 h-5 text-slate-400" />
+                        <Circle className="h-5 w-5 text-slate-400" />
                       )}
                     </button>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium ${task.completed ? 'line-through text-slate-500' : 'text-slate-900'}`}>
+                    <div className="min-w-0 flex-1">
+                      <p
+                        className={`text-sm font-medium ${task.completed ? 'text-slate-500 line-through' : 'text-slate-900'}`}
+                      >
                         {task.title}
                       </p>
                       <p className="text-xs text-slate-600">{task.subtitle}</p>
@@ -209,28 +274,37 @@ export default function DashboardPage() {
           {/* Right Column - Upcoming Sessions & Quick Actions */}
           <div className="space-y-8">
             {/* Upcoming Sessions */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-slate-900">Upcoming Sessions</h2>
-                <button className="text-slate-600 hover:text-slate-900 transition-colors">
-                  <Calendar className="w-5 h-5" />
+            <div className="rounded-xl border border-slate-200 bg-white p-6">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-slate-900">
+                  Upcoming Sessions
+                </h2>
+                <button className="text-slate-600 transition-colors hover:text-slate-900">
+                  <Calendar className="h-5 w-5" />
                 </button>
               </div>
               <div className="space-y-4">
-                {upcomingSessions.map((session) => (
-                  <div key={session.id} className="p-4 border border-slate-200 rounded-lg">
-                    <div className="flex items-start justify-between mb-2">
+                {upcomingSessions.map(session => (
+                  <div
+                    key={session.id}
+                    className="rounded-lg border border-slate-200 p-4"
+                  >
+                    <div className="mb-2 flex items-start justify-between">
                       <div>
-                        <h3 className="font-semibold text-slate-900 text-sm">{session.subject}</h3>
-                        <p className="text-xs text-slate-600">{session.mentor}</p>
+                        <h3 className="text-sm font-semibold text-slate-900">
+                          {session.subject}
+                        </h3>
+                        <p className="text-xs text-slate-600">
+                          {session.mentor}
+                        </p>
                       </div>
-                      <span className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded">
+                      <span className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-700">
                         {session.type}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs text-slate-600">
                       <span className="flex items-center">
-                        <Clock className="w-3 h-3 mr-1" />
+                        <Clock className="mr-1 h-3 w-3" />
                         {session.time}
                       </span>
                       <span>{session.duration}</span>
@@ -238,42 +312,52 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
-              <button className="w-full mt-4 py-2 text-center text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors">
+              <button className="mt-4 w-full rounded-lg py-2 text-center text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900">
                 View All Sessions
               </button>
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
-              <h2 className="text-xl font-semibold text-slate-900 mb-6">Quick Actions</h2>
+            <div className="rounded-xl border border-slate-200 bg-white p-6">
+              <h2 className="mb-6 text-xl font-semibold text-slate-900">
+                Quick Actions
+              </h2>
               <div className="space-y-3">
-                <button className="w-full p-3 text-left rounded-lg hover:bg-slate-50 transition-colors flex items-center justify-between">
+                <button className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-slate-50">
                   <div className="flex items-center">
-                    <Users className="w-5 h-5 text-slate-600 mr-3" />
-                    <span className="text-sm font-medium text-slate-900">Find New Mentors</span>
+                    <Users className="mr-3 h-5 w-5 text-slate-600" />
+                    <span className="text-sm font-medium text-slate-900">
+                      Find New Mentors
+                    </span>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                  <ChevronRight className="h-4 w-4 text-slate-400" />
                 </button>
-                <button className="w-full p-3 text-left rounded-lg hover:bg-slate-50 transition-colors flex items-center justify-between">
+                <button className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-slate-50">
                   <div className="flex items-center">
-                    <Calendar className="w-5 h-5 text-slate-600 mr-3" />
-                    <span className="text-sm font-medium text-slate-900">Schedule Session</span>
+                    <Calendar className="mr-3 h-5 w-5 text-slate-600" />
+                    <span className="text-sm font-medium text-slate-900">
+                      Schedule Session
+                    </span>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                  <ChevronRight className="h-4 w-4 text-slate-400" />
                 </button>
-                <button className="w-full p-3 text-left rounded-lg hover:bg-slate-50 transition-colors flex items-center justify-between">
+                <button className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-slate-50">
                   <div className="flex items-center">
-                    <TrendingUp className="w-5 h-5 text-slate-600 mr-3" />
-                    <span className="text-sm font-medium text-slate-900">View Progress</span>
+                    <TrendingUp className="mr-3 h-5 w-5 text-slate-600" />
+                    <span className="text-sm font-medium text-slate-900">
+                      View Progress
+                    </span>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                  <ChevronRight className="h-4 w-4 text-slate-400" />
                 </button>
-                <button className="w-full p-3 text-left rounded-lg hover:bg-slate-50 transition-colors flex items-center justify-between">
+                <button className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-slate-50">
                   <div className="flex items-center">
-                    <Settings className="w-5 h-5 text-slate-600 mr-3" />
-                    <span className="text-sm font-medium text-slate-900">Account Settings</span>
+                    <Settings className="mr-3 h-5 w-5 text-slate-600" />
+                    <span className="text-sm font-medium text-slate-900">
+                      Account Settings
+                    </span>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                  <ChevronRight className="h-4 w-4 text-slate-400" />
                 </button>
               </div>
             </div>
@@ -281,5 +365,5 @@ export default function DashboardPage() {
         </div>
       </div>
     </WebsiteLayout>
-  );
-} 
+  )
+}

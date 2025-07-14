@@ -1,11 +1,11 @@
-"use client";
+'use client'
 
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
 type Props = {
-  userId: string;
-  onSuccess: () => void;
-};
+  userId: string
+  onSuccess: () => void
+}
 
 const initialState = {
   universityName: '',
@@ -16,23 +16,23 @@ const initialState = {
   cgpa: '',
   projects: '',
   internships: '',
-};
+}
 
 export default function CollegeProfileForm({ userId, onSuccess }: Props) {
-  const [form, setForm] = useState(initialState);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [form, setForm] = useState(initialState)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(false);
-    setLoading(true);
+    e.preventDefault()
+    setError(null)
+    setSuccess(false)
+    setLoading(true)
     const payload = {
       userId,
       academicLevel: 'college',
@@ -42,27 +42,38 @@ export default function CollegeProfileForm({ userId, onSuccess }: Props) {
       minor: form.minor,
       semester: Number(form.semester),
       cgpa: Number(form.cgpa),
-      projects: form.projects.split(',').map(s => s.trim()).filter(Boolean),
-      internships: form.internships.split(',').map(s => s.trim()).filter(Boolean),
-    };
+      projects: form.projects
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean),
+      internships: form.internships
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean),
+    }
     const res = await fetch('/api/users/academic-details', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-    });
-    setLoading(false);
+    })
+    setLoading(false)
     if (res.ok) {
-      setSuccess(true);
-      onSuccess();
+      setSuccess(true)
+      onSuccess()
     } else {
-      const data = await res.json();
-      setError(data.error?.formErrors?.join(', ') || data.error || 'Submission failed');
+      const data = await res.json()
+      setError(
+        data.error?.formErrors?.join(', ') || data.error || 'Submission failed'
+      )
     }
-  };
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 bg-white rounded shadow space-y-4">
-      <h2 className="text-xl font-bold mb-2">College Profile</h2>
+    <form
+      onSubmit={handleSubmit}
+      className="mx-auto max-w-md space-y-4 rounded bg-white p-6 shadow"
+    >
+      <h2 className="mb-2 text-xl font-bold">College Profile</h2>
       {error && <div className="text-red-600">{error}</div>}
       {success && <div className="text-green-600">Saved!</div>}
       <input
@@ -70,7 +81,7 @@ export default function CollegeProfileForm({ userId, onSuccess }: Props) {
         value={form.universityName}
         onChange={handleChange}
         placeholder="University Name"
-        className="w-full border p-2 rounded"
+        className="w-full rounded border p-2"
         required
       />
       <input
@@ -78,7 +89,7 @@ export default function CollegeProfileForm({ userId, onSuccess }: Props) {
         value={form.degreeType}
         onChange={handleChange}
         placeholder="Degree Type (e.g. B.Tech, B.Sc)"
-        className="w-full border p-2 rounded"
+        className="w-full rounded border p-2"
         required
       />
       <input
@@ -86,7 +97,7 @@ export default function CollegeProfileForm({ userId, onSuccess }: Props) {
         value={form.major}
         onChange={handleChange}
         placeholder="Major"
-        className="w-full border p-2 rounded"
+        className="w-full rounded border p-2"
         required
       />
       <input
@@ -94,14 +105,14 @@ export default function CollegeProfileForm({ userId, onSuccess }: Props) {
         value={form.minor}
         onChange={handleChange}
         placeholder="Minor (optional)"
-        className="w-full border p-2 rounded"
+        className="w-full rounded border p-2"
       />
       <input
         name="semester"
         value={form.semester}
         onChange={handleChange}
         placeholder="Semester (number)"
-        className="w-full border p-2 rounded"
+        className="w-full rounded border p-2"
         required
         type="number"
         min={1}
@@ -111,7 +122,7 @@ export default function CollegeProfileForm({ userId, onSuccess }: Props) {
         value={form.cgpa}
         onChange={handleChange}
         placeholder="CGPA (0-10)"
-        className="w-full border p-2 rounded"
+        className="w-full rounded border p-2"
         required
         type="number"
         min={0}
@@ -123,22 +134,22 @@ export default function CollegeProfileForm({ userId, onSuccess }: Props) {
         value={form.projects}
         onChange={handleChange}
         placeholder="Projects (comma separated)"
-        className="w-full border p-2 rounded"
+        className="w-full rounded border p-2"
       />
       <input
         name="internships"
         value={form.internships}
         onChange={handleChange}
         placeholder="Internships (comma separated)"
-        className="w-full border p-2 rounded"
+        className="w-full rounded border p-2"
       />
       <button
         type="submit"
-        className="w-full bg-blue-600 text-white py-2 rounded font-semibold disabled:opacity-50"
+        className="w-full rounded bg-blue-600 py-2 font-semibold text-white disabled:opacity-50"
         disabled={loading}
       >
         {loading ? 'Saving...' : 'Save & Continue'}
       </button>
     </form>
-  );
+  )
 }

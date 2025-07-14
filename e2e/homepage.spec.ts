@@ -34,7 +34,9 @@ test.describe('Homepage', () => {
     await page.setViewportSize({ width: 375, height: 667 })
 
     // Check if mobile menu button is visible
-    await expect(page.locator('[data-testid="mobile-menu-button"]')).toBeVisible()
+    await expect(
+      page.locator('[data-testid="mobile-menu-button"]')
+    ).toBeVisible()
 
     // Check if desktop navigation is hidden
     await expect(page.locator('[data-testid="desktop-nav"]')).toBeHidden()
@@ -84,10 +86,10 @@ test.describe('Accessibility', () => {
     // Check for alt text on images
     const images = page.locator('img')
     const imageCount = await images.count()
-    
+
     for (let i = 0; i < imageCount; i++) {
       const img = images.nth(i)
       await expect(img).toHaveAttribute('alt')
     }
   })
-}) 
+})

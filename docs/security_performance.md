@@ -1,6 +1,7 @@
 # Security, Performance & Compliance Reference
 
 ## Security Requirements
+
 - JWT token authentication
 - Input validation and sanitization (Zod)
 - Rate limiting on APIs (per route group)
@@ -15,6 +16,7 @@
 - Content moderation (AI + human review)
 
 ## Performance Requirements
+
 - Database queries: < 100ms
 - API responses: 95% < 500ms
 - Page loads: FCP < 1.5s
@@ -29,6 +31,7 @@
 - CDN for static assets
 
 ## Compliance & Data Protection
+
 - GDPR compliance (data minimization, consent, right to access/deletion/portability)
 - Indian data localization (all Indian user data stored in India)
 - Minor protection (special protections for users under 18)
@@ -36,4 +39,4 @@
 - Data retention policies (user profiles: 7y, session recordings: 2y, payments: 7y, chat logs: 1y, audit logs: 5y)
 - Backup strategy (hourly DB, real-time file storage, config on change)
 - Incident response plan (detection, assessment, containment, eradication, recovery, review)
-- Service level: 99.9% uptime 
+- Service level: 99.9% uptime

@@ -5,6 +5,7 @@ A comprehensive mentorship platform built with Next.js 14, connecting students w
 ## 🚀 Features
 
 ### For Students
+
 - **Smart Mentor Matching**: AI-powered matching based on academic background, career goals, and interests
 - **Multi-step Onboarding**: Comprehensive profile setup with academic details, goals assessment, and preferences
 - **Interactive Dashboard**: Track progress, manage tasks, and view session history
@@ -12,12 +13,14 @@ A comprehensive mentorship platform built with Next.js 14, connecting students w
 - **Session Management**: Book, reschedule, and manage mentorship sessions
 
 ### For Mentors
+
 - **Profile Management**: Showcase expertise, experience, and availability
 - **Student Insights**: View student profiles and matching compatibility
 - **Session Tools**: Integrated calendar and session management
 - **Impact Tracking**: Monitor mentorship effectiveness and student progress
 
 ### Platform Features
+
 - **Responsive Design**: Mobile-first approach with modern UI/UX
 - **Real-time Communication**: Integrated messaging and video calls
 - **Progress Tracking**: Comprehensive analytics and reporting
@@ -37,22 +40,26 @@ A comprehensive mentorship platform built with Next.js 14, connecting students w
 ## 📦 Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/yourusername/upmentor.git
    cd upmentor
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env.local
    ```
-   
+
    Fill in your environment variables:
+
    ```env
    DATABASE_URL="postgresql://username:password@localhost:5432/upmentor"
    NEXTAUTH_URL="http://localhost:3000"
@@ -62,6 +69,7 @@ A comprehensive mentorship platform built with Next.js 14, connecting students w
    ```
 
 4. **Set up the database**
+
    ```bash
    npx prisma migrate deploy
    npx prisma generate
@@ -147,6 +155,7 @@ The application is optimized for deployment on Vercel:
 3. **Deploy** - Automatic deployments on push to main branch
 
 For other platforms, ensure you have:
+
 - Node.js 18+ runtime
 - PostgreSQL database
 - Environment variables configured

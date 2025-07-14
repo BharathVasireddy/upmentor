@@ -1,6 +1,7 @@
 # Tech Stack & Architecture Reference
 
 ## Core Technology Stack
+
 - **Frontend + Backend:** Next.js 14 with TypeScript
 - **Database:** PostgreSQL with Prisma ORM
 - **Authentication:** NextAuth.js (battle-tested)
@@ -10,6 +11,7 @@
 - **Deployment:** Vercel (optimized for Next.js)
 
 ## Rationale
+
 - **Next.js:** Mature, scalable, stable, large community
 - **PostgreSQL:** Reliable, complex queries
 - **Stripe:** Global leader, best documentation
@@ -17,6 +19,7 @@
 - **Zoom SDK:** Enterprise-grade, reliable video
 
 ## Key Architectural Patterns
+
 - **Monorepo:** Full-stack Next.js (App Router)
 - **TypeScript-first:** Type safety throughout
 - **Atomic Design:** UI components
@@ -29,6 +32,7 @@
 - **Vercel:** For deployment
 
 ## Best Practices
+
 - File-based routing
 - Server components by default
 - Streaming/Suspense for fast loads
@@ -36,4 +40,4 @@
 - Parallel routes for complex UI
 - Colocation of files
 - Middleware for auth/protection
-- Hot reload, error boundaries, loading states 
+- Hot reload, error boundaries, loading states
