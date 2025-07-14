@@ -169,4 +169,4 @@ For support, please open an issue in the GitHub repository or contact the develo
 
 ---
 
-Built with ❤️ using Next.js 14 and modern web technologies. 
+Built with ❤️ using Next.js 14 and modern web technologies. # GitHub Actions Secrets Added
