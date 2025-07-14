@@ -1,0 +1,184 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run E2E tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  e2e-tests:
+    name: End-to-End Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: upmentor_e2e
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Setup test database
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/upmentor_e2e
+        run: |
+          npx prisma migrate deploy
+          npx prisma generate
+          npx prisma db seed
+
+      - name: Build application
+        env:
+          NEXTAUTH_SECRET: e2e-test-secret
+          NEXTAUTH_URL: http://localhost:3000
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/upmentor_e2e
+        run: npm run build
+
+      - name: Start application
+        env:
+          NEXTAUTH_SECRET: e2e-test-secret
+          NEXTAUTH_URL: http://localhost:3000
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/upmentor_e2e
+        run: |
+          npm start &
+          sleep 10
+          curl -f http://localhost:3000 || exit 1
+
+      - name: Run E2E tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/upmentor_e2e
+        run: npx playwright test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload test videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-videos
+          path: test-results/
+          retention-days: 7
+
+  # Visual regression testing
+  visual-tests:
+    name: Visual Regression Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Build application
+        env:
+          NEXTAUTH_SECRET: visual-test-secret
+          NEXTAUTH_URL: http://localhost:3000
+        run: npm run build
+
+      - name: Start application
+        env:
+          NEXTAUTH_SECRET: visual-test-secret
+          NEXTAUTH_URL: http://localhost:3000
+        run: |
+          npm start &
+          sleep 10
+
+      - name: Run visual tests
+        run: npx playwright test --config=playwright-visual.config.ts
+
+      - name: Upload visual test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-test-results
+          path: test-results-visual/
+          retention-days: 7
+
+  # Performance testing
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        env:
+          NEXTAUTH_SECRET: perf-test-secret
+          NEXTAUTH_URL: http://localhost:3000
+        run: npm run build
+
+      - name: Start application
+        env:
+          NEXTAUTH_SECRET: perf-test-secret
+          NEXTAUTH_URL: http://localhost:3000
+        run: |
+          npm start &
+          sleep 10
+
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.12.x
+          lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+          retention-days: 7 
