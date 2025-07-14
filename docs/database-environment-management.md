@@ -3,6 +3,7 @@
 ## 🚨 **Critical Security Issue Resolved**
 
 Previously, the CI/CD pipeline was using the production database URL for all operations, which posed serious risks:
+
 - Tests could potentially modify production data
 - Staging deployments ran against production database
 - No isolation between environments
@@ -20,12 +21,12 @@ Production   → Production Database (isolated and protected)
 
 ### **Database URL Management**
 
-| Environment | Secret Name | Usage |
-|-------------|-------------|-------|
-| Development | `.env` file | Local development |
-| Testing | Local PostgreSQL | CI/CD testing (temporary) |
-| Staging | `DATABASE_URL_STAGING` | Staging deployments |
-| Production | `DATABASE_URL_PRODUCTION` | Production deployments |
+| Environment | Secret Name               | Usage                     |
+| ----------- | ------------------------- | ------------------------- |
+| Development | `.env` file               | Local development         |
+| Testing     | Local PostgreSQL          | CI/CD testing (temporary) |
+| Staging     | `DATABASE_URL_STAGING`    | Staging deployments       |
+| Production  | `DATABASE_URL_PRODUCTION` | Production deployments    |
 
 ## 🔧 **Current Implementation**
 
@@ -47,16 +48,19 @@ VERCEL_ORG_ID="your_org_id"
 ### **CI/CD Pipeline Flow**
 
 #### **Testing Phase**
+
 - Uses temporary PostgreSQL containers
 - Completely isolated from production
 - Database created and destroyed for each test run
 
 #### **Staging Deployment (develop branch)**
+
 - Uses `DATABASE_URL_STAGING` secret
 - Runs migrations against staging database
 - Safe for testing and validation
 
 #### **Production Deployment (main branch)**
+
 - Uses `DATABASE_URL_PRODUCTION` secret
 - Runs migrations against production database
 - Only after successful staging validation
@@ -136,12 +140,14 @@ graph TD
 ## 🚨 **Important Notes**
 
 ### **Current Status**
+
 - ✅ **Production database protected** with `DATABASE_URL_PRODUCTION`
 - ⚠️ **Staging database temporarily uses production URL** (needs separate staging DB)
 - ✅ **Testing uses isolated containers**
 - ✅ **Migration jobs separated by environment**
 
 ### **Next Steps**
+
 1. **Create staging database** on Neon
 2. **Update `DATABASE_URL_STAGING`** secret with staging database URL
 3. **Test staging deployment** to verify isolation
@@ -150,11 +156,13 @@ graph TD
 ## 🔍 **Monitoring and Maintenance**
 
 ### **Database Health Checks**
+
 - **Production**: Monitor for unauthorized access
 - **Staging**: Regular resets with fresh test data
 - **Testing**: Verify container cleanup after tests
 
 ### **Backup Strategy**
+
 - **Production**: Daily automated backups
 - **Staging**: Weekly backups (optional)
 - **Testing**: No backups needed (temporary data)
@@ -168,4 +176,4 @@ graph TD
 
 ---
 
-**Remember**: Never use production database URLs in CI/CD testing environments. Always maintain strict separation between environments to prevent data loss and security breaches. 
+**Remember**: Never use production database URLs in CI/CD testing environments. Always maintain strict separation between environments to prevent data loss and security breaches.

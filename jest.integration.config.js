@@ -17,23 +17,23 @@ const customJestConfig = {
     '^@/types/(.*)$': '<rootDir>/src/types/$1',
   },
   testEnvironment: 'jest-environment-jsdom',
-  
+
   // Integration test specific configuration
   testMatch: [
     '**/tests/integration/**/*.{js,jsx,ts,tsx}',
     '**/*.integration.test.{js,jsx,ts,tsx}',
   ],
-  
+
   // Ignore patterns
   testPathIgnorePatterns: [
     '<rootDir>/.next/',
     '<rootDir>/node_modules/',
     '<rootDir>/e2e/',
   ],
-  
+
   // Integration tests might take longer
   testTimeout: 30000,
-  
+
   // Coverage configuration for integration tests
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
@@ -41,13 +41,13 @@ const customJestConfig = {
     '!src/**/*.test.{js,jsx,ts,tsx}',
     '!src/**/*.spec.{js,jsx,ts,tsx}',
   ],
-  
+
   // Clear mocks between tests
   clearMocks: true,
-  
+
   // Verbose output for integration tests
   verbose: true,
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-module.exports = createJestConfig(customJestConfig) 
+module.exports = createJestConfig(customJestConfig)

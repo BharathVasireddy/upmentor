@@ -31,7 +31,7 @@ describe('API Integration Tests', () => {
     it('should mock database operations', async () => {
       // Import here to avoid hoisting issues
       const { user } = require('../../src/lib/prisma')
-      
+
       user.findUnique.mockResolvedValue({
         id: '1',
         email: 'test@example.com',
@@ -80,4 +80,4 @@ describe('API Integration Tests', () => {
       expect(mockResponse.statusCode).toBe(200)
     })
   })
-}) 
+})

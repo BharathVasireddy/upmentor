@@ -81,12 +81,13 @@
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "lint-staged": {
+    "*.{js,jsx,ts,tsx,md,json,yml,yaml,css,scss,html}": [
+      "prettier --write",
+      "git add"
+    ],
     "*.{js,jsx,ts,tsx}": [
       "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md,yml,yaml}": [
-      "prettier --write"
+      "git add"
     ]
   }
 }
