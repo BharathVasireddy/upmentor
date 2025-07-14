@@ -1,0 +1,3014 @@
+# Mentorship Platform - Development PRD
+**For Cursor AI & Development Team**
+
+## 1. Tech Stack Decision
+
+### 1.1 Video Calling Recommendation
+**Use Zoom SDK (Not WebRTC)**
+- **Why:** Enterprise-grade reliability, proven at scale
+- **Reality Check:** WebRTC is complex, requires significant infrastructure
+- **Benefits:** Battle-tested, handles poor network conditions, extensive documentation
+- **Trade-off:** External dependency but worth it for reliability
+
+### 1.2 Core Technology Stack
+**Full-Stack Next.js (Most Stable & Scalable)**
+- **Frontend + Backend:** Next.js 14 with TypeScript
+- **Database:** PostgreSQL with Prisma ORM
+- **Authentication:** NextAuth.js (battle-tested)
+- **Video:** Zoom SDK (most reliable)
+- **Payments:** Stripe (global standard)
+- **Storage:** AWS S3 (industry standard)
+- **Deployment:** Vercel (optimized for Next.js)
+
+**Why This Stack:**
+- **Next.js:** Mature framework, huge community, regular but stable updates
+- **PostgreSQL:** Most reliable database, excellent for complex queries
+- **Stripe:** Global payment leader, best documentation
+- **AWS S3:** Industry standard, never goes down
+- **Zoom SDK:** Most reliable video solution for business apps
+
+---
+
+## 2. Database Schema
+
+### 2.1 Core Tables
+```sql
+-- Users table (Students only - no professionals)
+users (
+  id, email, phone, name, password_hash, 
+  profile_image, date_of_birth, gender,
+  city, state, country, timezone,
+  current_grade, academic_level, institution_name,
+  field_of_study, graduation_year, gpa_score,
+  interests[], career_goals[], preferred_industries[],
+  primary_language, languages_spoken[], linkedin_url,
+  created_at, updated_at, is_verified, onboarding_completed
+)
+
+-- Academic Details table (School and College students only)
+academic_details (
+  id, user_id, academic_level,
+  -- School Students
+  school_name, board, class_grade, stream,
+  subjects[], extracurricular[],
+  -- College Students  
+  university_name, degree_type, major, minor,
+  semester, cgpa, projects[], internships[],
+  -- Common fields
+  achievements[], goals[], challenges[],
+  created_at, updated_at
+)
+
+-- Career Preferences table
+career_preferences (
+  id, user_id, preferred_roles[], target_companies[],
+  desired_locations[], work_preferences, career_timeline,
+  specific_concerns[], created_at, updated_at
+)
+
+-- Mentors table (Enhanced with language support)
+mentors (
+  id, user_id, title, university, company, 
+  experience_years, expertise_areas[], 
+  academic_specializations[], industry_focus[],
+  student_levels_served[], hourly_rate, bio, 
+  linkedin_url, verification_status, verification_docs[], 
+  total_sessions, avg_rating, response_time,
+  primary_language, languages_spoken[], timezone, 
+  is_active, mentor_type
+)
+
+-- User Roles table (Student, Mentor, Admin, Support)
+user_roles (
+  id, user_id, role_type, permissions[],
+  assigned_by, assigned_at, is_active
+)
+
+-- Admin/Support Users table
+admin_users (
+  id, user_id, admin_type, department,
+  permissions[], managed_regions[],
+  managed_languages[], created_at
+)
+
+-- Language Support table
+languages (
+  id, language_code, language_name, 
+  is_active, region, native_speakers_count
+)
+
+-- Sessions table (No document requirements)
+sessions (
+  id, user_id, mentor_id, scheduled_at, 
+  duration, amount, status, payment_id,
+  session_type, session_language, user_questions[], 
+  mentor_notes, video_room_id, recording_url, 
+  follow_up_tasks[], satisfaction_rating, created_at
+)
+
+-- User Progress Tracking
+user_progress (
+  id, user_id, milestone_type, milestone_data,
+  achieved_at, mentor_id, session_id,
+  progress_notes, next_steps[]
+)
+```
+
+---
+
+## 3. Core Features for Development
+
+### 3.1 User Management (Students Only)
+**Student Registration & Onboarding**
+- Multi-step registration for school and college students only
+- Language preference selection during signup
+- Dynamic form fields based on academic level (school/college)
+- Location and timezone detection
+- Academic profiling without document upload
+- Language-based mentor matching
+
+**Student Onboarding Flow:**
+1. **Basic Info:** Name, email, phone, location, primary language
+2. **Academic Level:** School Student or College Student
+3. **Academic Details:** 
+   - School: Grade, board, subjects, stream
+   - College: University, degree, major, semester, CGPA
+4. **Language Preferences:** Primary language, additional languages spoken
+5. **Career Goals:** Industry preferences, target roles, timeline
+6. **Interests & Challenges:** Specific areas needing guidance
+7. **Profile Completion:** Upload photo, set preferences
+
+**Role-Based Dashboard Access:**
+- **Students:** Academic progress, mentor discovery, session booking
+- **Mentors:** Student requests, session management, earnings
+- **Admins:** Platform management, mentor verification, analytics
+- **Support:** User assistance, issue resolution, quality control
+
+### 3.2 Mentor Profile System (LinkedIn-style)
+**Profile Components:**
+- **Header Section:** Profile photo, name, title, university/company
+- **About Section:** Professional bio, expertise areas
+- **Experience Section:** Work history, education details
+- **Skills & Endorsements:** Expertise tags, certifications
+- **Statistics:** Total sessions, average rating, response time
+- **Reviews Section:** Student feedback with ratings
+- **Availability:** Calendar integration, time slots
+- **Pricing:** Hourly rates, session packages
+
+**Profile URL Structure:**
+- `/mentor/[mentor-slug]` (e.g., `/mentor/dr-priya-sharma`)
+- SEO-friendly URLs with mentor names
+
+### 3.3 Language-Based Matching & Discovery System
+**Smart Language Matching Algorithm**
+- Primary language compatibility (Hindi, English, Telugu, Tamil, etc.)
+- Multi-language support for bilingual sessions
+- Regional mentor preferences
+- Cultural context consideration
+- Language proficiency levels matching
+
+**Enhanced Discovery Features:**
+- **Academic Level Filters:** School students, college students
+- **Language Filters:** Primary language, additional languages
+- **Subject/Field Filters:** Engineering, Medicine, Business, Arts, etc.
+- **Experience Filters:** Industry experience, academic background
+- **Location Filters:** Same city, same state, timezone compatibility
+- **Specialization Search:** Specific areas like "Data Science," "NEET preparation," "Engineering entrance"
+
+**Language-Aware Recommendations:**
+- Algorithm considering user's language preferences and academic profile
+- Regional mentors who understand local education systems
+- Language-specific career guidance (e.g., regional opportunities)
+- Cultural context in career advice
+
+### 3.4 Simplified Booking System (No Documents Required)
+**Streamlined Pre-Session Information:**
+- Session purpose and specific questions
+- Current academic challenges
+- Expected outcomes from the session
+- Preferred session language
+- Previous session follow-up (if applicable)
+
+**Session Booking Flow:**
+1. Student selects mentor from language-filtered recommendations
+2. Views mentor profile with language compatibility
+3. Fills simple pre-session questionnaire
+4. Selects session type (Academic guidance, Career counseling, Exam prep)
+5. Chooses preferred language for the session
+6. Selects available time slot and duration
+7. Makes payment - no document upload required
+8. Receives booking confirmation in preferred language
+
+**Calendar & Scheduling:**
+- Timezone-aware scheduling
+- Language preference consideration
+- Google Calendar sync for both parties
+- Automatic reminders in user's preferred language
+- Reschedule/cancel with academic calendar consideration
+- Exam season priority booking
+
+### 3.5 Payment Integration
+**Razorpay Implementation:**
+- Session-based payments
+- Automatic 70-30 commission split
+- Refund handling
+- Invoice generation
+- Payout management for mentors
+
+---
+
+## 4. API Endpoints Structure
+
+### 4.1 Production-Grade API Structure (Next.js 14 Best Practices)
+```
+src/app/api/
+├── auth/
+│   ├── register/route.ts (Student registration)
+│   ├── mentor-register/route.ts (Mentor registration)
+│   └── [...nextauth]/route.ts (NextAuth handler)
+├── users/
+│   ├── profile/route.ts (GET, PUT user profile)
+│   ├── academic-details/route.ts (GET, PUT academic info)
+│   ├── language-preferences/route.ts (GET, PUT languages)
+│   ├── progress/route.ts (GET user progress)
+│   └── [id]/route.ts (GET specific user - admin only)
+├── mentors/
+│   ├── route.ts (GET all mentors with filters)
+│   ├── search/route.ts (POST advanced search)
+│   ├── [id]/route.ts (GET specific mentor profile)
+│   ├── apply/route.ts (POST mentor application)
+│   ├── availability/route.ts (GET, PUT mentor availability)
+│   ├── languages/route.ts (GET mentors by language)
+│   └── verification/route.ts (PUT verification status - admin)
+├── sessions/
+│   ├── route.ts (GET user sessions, POST book session)
+│   ├── [id]/route.ts (GET, PUT, DELETE specific session)
+│   ├── [id]/notes/route.ts (POST session notes)
+│   ├── upcoming/route.ts (GET upcoming sessions)
+│   ├── history/route.ts (GET session history)
+│   └── reschedule/route.ts (PUT reschedule session)
+├── matching/
+│   ├── recommendations/route.ts (GET personalized recommendations)
+│   ├── compatibility/route.ts (POST compatibility score)
+│   ├── language-match/route.ts (GET language-based matches)
+│   └── filters/route.ts (GET available filter options)
+├── payments/
+│   ├── create-intent/route.ts (POST create payment intent)
+│   ├── confirm/route.ts (POST confirm payment)
+│   ├── webhook/route.ts (POST Stripe webhook)
+│   └── history/route.ts (GET payment history)
+├── admin/
+│   ├── mentors/route.ts (GET all mentors - admin)
+│   ├── users/route.ts (GET all users - admin)
+│   ├── sessions/route.ts (GET all sessions - admin)
+│   ├── analytics/route.ts (GET platform analytics)
+│   └── languages/route.ts (GET, POST manage languages)
+├── support/
+│   ├── tickets/route.ts (GET, POST support tickets)
+│   ├── [id]/route.ts (GET, PUT specific ticket)
+│   └── chat/route.ts (POST support chat)
+└── uploads/
+    ├── profile-images/route.ts (POST upload profile image)
+    └── verification-docs/route.ts (POST mentor verification docs)
+```
+
+**API Best Practices Implemented:**
+- **RESTful conventions** with proper HTTP methods
+- **Route grouping** by feature for maintainability
+- **TypeScript** for type safety
+- **Error handling** with standardized error responses
+- **Validation** using Zod schemas
+- **Authentication middleware** for protected routes
+- **Rate limiting** for API protection
+- **Caching** for performance optimization
+
+---
+
+## 5. Frontend Components Structure
+
+### 5.1 Production-Grade Component Structure
+```
+src/components/
+├── ui/ (Shadcn/ui - Industry standard)
+│   ├── button.tsx
+│   ├── input.tsx
+│   ├── select.tsx
+│   ├── modal.tsx
+│   ├── form.tsx
+│   ├── card.tsx
+│   ├── badge.tsx
+│   ├── avatar.tsx
+│   ├── dropdown-menu.tsx
+│   ├── calendar.tsx
+│   └── index.ts (Barrel exports)
+├── forms/ (Reusable form components)
+│   ├── AcademicProfileForm.tsx
+│   ├── LanguageSelector.tsx
+│   ├── PreSessionForm.tsx
+│   ├── MentorApplicationForm.tsx
+│   └── ContactForm.tsx
+├── layout/ (Layout components)
+│   ├── Header.tsx
+│   ├── Footer.tsx
+│   ├── Sidebar.tsx
+│   ├── Navigation.tsx
+│   ├── AuthLayout.tsx
+│   ├── DashboardLayout.tsx
+│   └── AdminLayout.tsx
+├── onboarding/ (Student onboarding)
+│   ├── AcademicLevelSelector.tsx
+│   ├── SchoolProfileForm.tsx
+│   ├── CollegeProfileForm.tsx
+│   ├── LanguagePreferences.tsx
+│   ├── GoalsAssessment.tsx
+│   └── ProgressStepper.tsx
+├── mentors/ (Mentor-related components)
+│   ├── MentorCard.tsx
+│   ├── MentorProfile.tsx
+│   ├── MentorGrid.tsx
+│   ├── MentorFilters.tsx
+│   ├── LanguageCompatibility.tsx
+│   ├── AvailabilityCalendar.tsx
+│   └── RecommendationsList.tsx
+├── sessions/ (Session management)
+│   ├── BookingCalendar.tsx
+│   ├── SessionCard.tsx
+│   ├── VideoCallInterface.tsx
+│   ├── SessionNotes.tsx
+│   ├── SessionHistory.tsx
+│   └── RescheduleModal.tsx
+├── dashboard/ (Dashboard components)
+│   ├── StudentDashboard.tsx
+│   ├── MentorDashboard.tsx
+│   ├── AdminDashboard.tsx
+│   ├── ProgressTracker.tsx
+│   ├── UpcomingSessions.tsx
+│   ├── QuickActions.tsx
+│   └── LanguageStats.tsx
+├── admin/ (Admin-only components)
+│   ├── MentorVerification.tsx
+│   ├── UserManagement.tsx
+│   ├── AnalyticsDashboard.tsx
+│   ├── LanguageManagement.tsx
+│   └── SupportTickets.tsx
+├── common/ (Shared components)
+│   ├── LoadingSpinner.tsx
+│   ├── ErrorBoundary.tsx
+│   ├── EmptyState.tsx
+│   ├── ConfirmDialog.tsx
+│   ├── ImageUpload.tsx
+│   ├── LanguageSwitcher.tsx
+│   └── SearchBar.tsx
+└── providers/ (Context providers)
+    ├── AuthProvider.tsx
+    ├── LanguageProvider.tsx
+    ├── ThemeProvider.tsx
+    └── QueryProvider.tsx
+```
+
+**Component Architecture Best Practices:**
+- **Atomic Design Pattern** with ui → components → pages hierarchy
+- **Single Responsibility** - each component has one clear purpose
+- **Composition over Inheritance** using React patterns
+- **TypeScript interfaces** for all component props
+- **Barrel exports** for clean imports
+- **Error boundaries** for graceful error handling
+- **Responsive design** with Tailwind CSS
+- **Accessibility** following WCAG guidelines
+
+---
+
+## 6. Development Phases
+
+### 6.1 Phase 1 (Weeks 1-4): Foundation + Enhanced Onboarding
+**Backend Setup:**
+- Database schema with academic profiling
+- User authentication with multi-step onboarding
+- Dynamic form generation API
+- Document upload system
+- Basic admin panel for mentor verification
+
+**Frontend Setup:**
+- Next.js project with enhanced user flows
+- Multi-step registration with academic level detection
+- Dynamic form components based on user type
+- Document upload interface
+- Basic dashboard layouts for different user types
+
+### 6.2 Phase 2 (Weeks 5-8): Advanced Matching + Profiles
+**Enhanced Matching System:**
+- Comprehensive mentor-student compatibility algorithm
+- Advanced search and filtering system
+- Location and timezone-based recommendations
+- Academic level and field-specific matching
+
+**Profile Systems:**
+- Enhanced mentor profiles with specializations
+- Student/professional profiles with academic tracking
+- Progress monitoring system
+- Document verification workflows
+
+### 6.3 Phase 3 (Weeks 9-12): Sessions + Analytics
+**Session Management:**
+- Pre-session questionnaire system
+- Enhanced booking with academic context
+- Post-session progress tracking
+- Follow-up task management
+
+**Analytics & Intelligence:**
+- User progress tracking dashboard
+- Success metrics and milestone tracking
+- Recommendation engine refinement
+- Academic calendar integration
+
+---
+
+## 7. Key Implementation Details
+
+### 7.1 Mentor Profile Page Structure
+```jsx
+// Mentor Profile Page Layout
+<MentorProfile>
+  <ProfileHeader>
+    <ProfileImage />
+    <BasicInfo />
+    <RatingStats />
+    <BookNowButton />
+  </ProfileHeader>
+  
+  <ProfileContent>
+    <AboutSection />
+    <ExperienceSection />
+    <SkillsSection />
+    <ReviewsSection />
+    <AvailabilitySection />
+  </ProfileContent>
+</MentorProfile>
+```
+
+### 7.2 Enhanced Language-Aware Matching Algorithm
+```typescript
+// Comprehensive student-mentor matching with language support
+interface MatchingParams {
+  student: StudentProfile;
+  mentors: MentorProfile[];
+  languagePreference: string;
+  urgency?: 'low' | 'medium' | 'high';
+}
+
+function matchMentors({ student, mentors, languagePreference, urgency }: MatchingParams) {
+  return mentors
+    .filter(mentor => 
+      mentor.is_active && 
+      mentor.verification_status === 'approved' &&
+      mentor.student_levels_served.includes(student.academic_level)
+    )
+    .map(mentor => {
+      const scores = {
+        // Language compatibility (highest weight for Indian market)
+        languageMatch: calculateLanguageMatch(
+          student.primary_language, 
+          student.languages_spoken,
+          mentor.primary_language,
+          mentor.languages_spoken
+        ),
+        
+        // Academic level and field match
+        academicLevel: calculateAcademicLevelMatch(
+          student.academic_level, 
+          mentor.student_levels_served
+        ),
+        
+        // Subject/field expertise
+        fieldExpertise: calculateFieldMatch(
+          student.field_of_study, 
+          mentor.academic_specializations
+        ),
+        
+        // Geographic and cultural context
+        locationContext: calculateLocationMatch(
+          student.state,
+          student.city,
+          mentor.timezone,
+          mentor.managed_regions
+        ),
+        
+        // Goals alignment
+        careerGoals: calculateCareerGoalsMatch(
+          student.career_goals, 
+          mentor.expertise_areas
+        ),
+        
+        // Mentor quality metrics
+        rating: mentor.avg_rating / 5,
+        availability: mentor.response_time < 24 ? 1 : 0.5,
+        experience: Math.min(mentor.experience_years / 10, 1)
+      };
+      
+      // Weighted scoring for Indian education context
+      const weights = {
+        languageMatch: 0.30,     // Very important in India
+        academicLevel: 0.25,     // Academic compatibility
+        fieldExpertise: 0.20,    // Subject expertise
+        locationContext: 0.10,   // Regional understanding
+        careerGoals: 0.10,       // Future planning
+        rating: 0.03,            // Quality indicator
+        availability: 0.01,      // Response time
+        experience: 0.01         // Mentor experience
+      };
+      
+      const matchScore = Object.keys(scores).reduce((total, key) => {
+        return total + (scores[key] * weights[key]);
+      }, 0);
+      
+      return {
+        ...mentor,
+        matchScore,
+        languageCompatibility: scores.languageMatch,
+        compatibilityReasons: getCompatibilityReasons(scores, student)
+      };
+    })
+    .sort((a, b) => b.matchScore - a.matchScore);
+}
+
+// Language matching algorithm for Indian context
+function calculateLanguageMatch(
+  studentPrimary: string,
+  studentLanguages: string[],
+  mentorPrimary: string,
+  mentorLanguages: string[]
+): number {
+  // Perfect match for same primary language
+  if (studentPrimary === mentorPrimary) return 1.0;
+  
+  // High score if mentor speaks student's primary language
+  if (mentorLanguages.includes(studentPrimary)) return 0.9;
+  
+  // Medium score for common languages
+  const commonLanguages = studentLanguages.filter(lang => 
+    mentorLanguages.includes(lang)
+  );
+  
+  if (commonLanguages.length > 0) return 0.7;
+  
+  // English fallback (common in Indian education)
+  if (mentorLanguages.includes('English') && studentLanguages.includes('English')) {
+    return 0.6;
+  }
+  
+  return 0.2; // Minimal compatibility
+}
+
+// Simplified academic form for students only
+function generateStudentForm(academicLevel: 'school' | 'college') {
+  const forms = {
+    school: {
+      fields: [
+        'school_name', 'board', 'class_grade', 'stream', 
+        'subjects', 'extracurricular', 'primary_language'
+      ],
+      validations: {
+        class_grade: { min: 6, max: 12 },
+        subjects: { minItems: 3, maxItems: 8 },
+        primary_language: { required: true }
+      }
+    },
+    college: {
+      fields: [
+        'university_name', 'degree_type', 'major', 'minor', 
+        'semester', 'cgpa', 'projects', 'primary_language'
+      ],
+      validations: {
+        semester: { min: 1, max: 10 },
+        cgpa: { min: 0, max: 10 },
+        primary_language: { required: true }
+      }
+    }
+  };
+  
+  return forms[academicLevel];
+}
+``` 'certifications'],
+      validations: {
+        experience_years: { min: 0, max: 50 },
+        skills: { minItems: 3, maxItems: 15 }
+      }
+    }
+  };
+  
+  return forms[academicLevel] || forms.school;
+}
+```
+
+### 7.3 Zoom SDK Integration
+```javascript
+// Zoom SDK implementation (more reliable than WebRTC)
+import { ZoomMtg } from '@zoomus/websdk';
+
+const createZoomMeeting = async (sessionId) => {
+  const meeting = await fetch('/api/zoom/create-meeting', {
+    method: 'POST',
+    body: JSON.stringify({
+      topic: `Mentorship Session ${sessionId}`,
+      type: 2, // Scheduled meeting
+      duration: 60,
+      settings: {
+        join_before_host: false,
+        waiting_room: true,
+        auto_recording: 'cloud'
+      }
+    })
+  });
+  return meeting.json();
+};
+```
+
+---
+
+## 8. Security & Performance
+
+### 8.1 Security Requirements
+- JWT token authentication
+- Input validation and sanitization
+- Rate limiting on APIs
+- CORS configuration
+- Secure payment processing
+- Data encryption
+
+### 8.2 Performance Optimization
+- Image optimization with Next.js
+- Database query optimization
+- Caching with Redis
+- CDN for static assets
+- Lazy loading for components
+
+---
+
+## 9. Testing Strategy
+
+### 9.1 Testing Requirements
+- Unit tests for utility functions
+- Integration tests for API endpoints
+- E2E tests for booking flow
+- Payment gateway testing
+- Video call functionality testing
+
+### 9.2 Quality Assurance
+- Code review process
+- Performance monitoring
+- Error tracking (Sentry)
+- User acceptance testing
+- Load testing for video calls
+
+---
+
+## 10. Deployment & DevOps
+
+## 13. Performance Optimization & Speed Requirements
+
+### 13.1 Database Performance Best Practices
+
+**Database Schema Optimizations:**
+```sql
+-- Optimized indexes for fast queries
+CREATE INDEX CONCURRENTLY idx_users_academic_level ON users(academic_level);
+CREATE INDEX CONCURRENTLY idx_users_primary_language ON users(primary_language);
+CREATE INDEX CONCURRENTLY idx_users_location ON users(city, state);
+CREATE INDEX CONCURRENTLY idx_mentors_active_verified ON mentors(is_active, verification_status) WHERE is_active = true;
+CREATE INDEX CONCURRENTLY idx_mentors_languages ON mentors USING GIN(languages_spoken);
+CREATE INDEX CONCURRENTLY idx_mentors_specializations ON mentors USING GIN(academic_specializations);
+CREATE INDEX CONCURRENTLY idx_mentors_rating ON mentors(avg_rating DESC, total_sessions DESC);
+CREATE INDEX CONCURRENTLY idx_sessions_user_status ON sessions(user_id, status);
+CREATE INDEX CONCURRENTLY idx_sessions_mentor_upcoming ON mentors(mentor_id) WHERE scheduled_at > NOW();
+
+-- Composite indexes for complex queries
+CREATE INDEX CONCURRENTLY idx_mentor_search ON mentors(is_active, verification_status, primary_language, avg_rating DESC);
+CREATE INDEX CONCURRENTLY idx_user_matching ON users(academic_level, primary_language, field_of_study);
+```
+
+**Query Optimization Patterns:**
+```typescript
+// Instead of N+1 queries, use efficient joins
+const getMentorsWithDetails = async (filters: MentorFilters) => {
+  return await prisma.mentor.findMany({
+    where: {
+      is_active: true,
+      verification_status: 'approved',
+      languages_spoken: { has: filters.language },
+      academic_specializations: { hasSome: filters.subjects }
+    },
+    select: {
+      id: true,
+      user: {
+        select: { name: true, profile_image: true }
+      },
+      title: true,
+      avg_rating: true,
+      total_sessions: true,
+      hourly_rate: true,
+      languages_spoken: true,
+      response_time: true
+    },
+    orderBy: [
+      { avg_rating: 'desc' },
+      { total_sessions: 'desc' }
+    ],
+    take: 20 // Pagination
+  });
+};
+
+// Use database-level filtering instead of application filtering
+const getRecommendations = async (studentId: string) => {
+  const student = await prisma.user.findUnique({
+    where: { id: studentId },
+    select: { academic_level: true, primary_language: true, field_of_study: true }
+  });
+
+  return await prisma.$queryRaw`
+    SELECT m.*, u.name, u.profile_image,
+           -- Compatibility score calculation at DB level
+           (CASE WHEN m.primary_language = ${student.primary_language} THEN 3
+                 WHEN ${student.primary_language} = ANY(m.languages_spoken) THEN 2
+                 WHEN 'English' = ANY(m.languages_spoken) THEN 1
+                 ELSE 0 END) +
+           (CASE WHEN ${student.academic_level} = ANY(m.student_levels_served) THEN 2 ELSE 0 END) +
+           (CASE WHEN ${student.field_of_study} = ANY(m.academic_specializations) THEN 2 ELSE 0 END)
+           AS compatibility_score
+    FROM mentors m
+    JOIN users u ON m.user_id = u.id
+    WHERE m.is_active = true AND m.verification_status = 'approved'
+    ORDER BY compatibility_score DESC, m.avg_rating DESC
+    LIMIT 10;
+  `;
+};
+```
+
+### 13.2 API Performance Standards
+
+**Response Time Requirements:**
+- **Search/Filter APIs:** < 200ms
+- **Mentor Recommendations:** < 300ms
+- **Booking APIs:** < 500ms
+- **Profile Updates:** < 400ms
+- **Authentication:** < 150ms
+
+**Async Pattern Implementation:**
+```typescript
+// Fast API pattern with background processing
+export async function POST(request: Request) {
+  try {
+    // 1. Quick validation and immediate response
+    const body = await request.json();
+    const validatedData = bookingSchema.parse(body);
+    
+    // 2. Fast database operations first
+    const session = await prisma.session.create({
+      data: {
+        ...validatedData,
+        status: 'pending'
+      },
+      select: { id: true, scheduled_at: true, mentor_id: true }
+    });
+
+    // 3. Return immediate response
+    const response = NextResponse.json({ 
+      sessionId: session.id, 
+      status: 'confirmed',
+      message: 'Booking confirmed! Notifications are being sent.'
+    });
+
+    // 4. Background processing (don't await)
+    processBookingAsync(session.id);
+    
+    return response;
+    
+  } catch (error) {
+    return NextResponse.json({ error: 'Booking failed' }, { status: 400 });
+  }
+}
+
+// Background processing function
+async function processBookingAsync(sessionId: string) {
+  try {
+    // Send emails, calendar invites, notifications in background
+    await Promise.allSettled([
+      sendConfirmationEmail(sessionId),
+      createCalendarEvent(sessionId),
+      sendPushNotification(sessionId),
+      updateMentorAvailability(sessionId)
+    ]);
+  } catch (error) {
+    // Log error but don't affect user experience
+    console.error('Background processing failed:', error);
+  }
+}
+```
+
+### 13.3 Caching Strategy
+
+**Multi-Level Caching:**
+```typescript
+// 1. Database query caching with Redis
+const getCachedMentors = async (cacheKey: string, queryFn: () => Promise<any>) => {
+  const cached = await redis.get(cacheKey);
+  if (cached) return JSON.parse(cached);
+  
+  const result = await queryFn();
+  await redis.setex(cacheKey, 300, JSON.stringify(result)); // 5 min cache
+  return result;
+};
+
+// 2. API response caching
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const cacheKey = `mentors:${searchParams.toString()}`;
+  
+  const mentors = await getCachedMentors(cacheKey, () => 
+    getMentorsWithFilters(Object.fromEntries(searchParams))
+  );
+  
+  return NextResponse.json(mentors, {
+    headers: {
+      'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
+    }
+  });
+}
+
+// 3. Client-side caching with React Query
+const useMentors = (filters: MentorFilters) => {
+  return useQuery({
+    queryKey: ['mentors', filters],
+    queryFn: () => fetchMentors(filters),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false
+  });
+};
+```
+
+### 13.4 Frontend Performance Patterns
+
+**Optimistic Updates:**
+```typescript
+// Immediate UI feedback with background sync
+const bookSession = useMutation({
+  mutationFn: async (bookingData) => {
+    // Optimistically update UI immediately
+    queryClient.setQueryData(['sessions'], (old) => [
+      ...old,
+      { ...bookingData, status: 'confirmed', id: 'temp-' + Date.now() }
+    ]);
+    
+    // Make API call in background
+    return api.post('/sessions/book', bookingData);
+  },
+  onError: (error, variables, context) => {
+    // Revert optimistic update on error
+    queryClient.invalidateQueries(['sessions']);
+    toast.error('Booking failed. Please try again.');
+  },
+  onSuccess: (data) => {
+    // Replace temporary data with real data
+    queryClient.invalidateQueries(['sessions']);
+    toast.success('Session booked successfully!');
+  }
+});
+```
+
+**Lazy Loading & Code Splitting:**
+```typescript
+// Component-level code splitting
+const VideoCallInterface = lazy(() => import('@/components/sessions/VideoCallInterface'));
+const AdminDashboard = lazy(() => import('@/components/admin/AdminDashboard'));
+
+// Route-level code splitting with loading states
+const SessionPage = () => {
+  return (
+    <Suspense fallback={<SessionLoadingSkeleton />}>
+      <VideoCallInterface />
+    </Suspense>
+  );
+};
+
+// Image optimization
+const MentorCard = ({ mentor }) => (
+  <Card>
+    <Image
+      src={mentor.profile_image}
+      alt={mentor.name}
+      width={200}
+      height={200}
+      placeholder="blur"
+      blurDataURL="data:image/jpeg;base64,..."
+      priority={false}
+      loading="lazy"
+    />
+  </Card>
+);
+```
+
+### 13.5 Real-time Features Without Blocking
+
+**WebSocket Integration:**
+```typescript
+// Non-blocking real-time updates
+const useRealtimeUpdates = (sessionId: string) => {
+  useEffect(() => {
+    const ws = new WebSocket(`${WS_URL}/sessions/${sessionId}`);
+    
+    ws.onmessage = (event) => {
+      const update = JSON.parse(event.data);
+      
+      // Update UI without blocking
+      queryClient.setQueryData(['session', sessionId], (old) => ({
+        ...old,
+        ...update
+      }));
+    };
+    
+    return () => ws.close();
+  }, [sessionId]);
+};
+
+// Background sync for offline support
+const useBackgroundSync = () => {
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').then((registration) => {
+        // Handle background sync
+        registration.sync.register('sync-pending-actions');
+      });
+    }
+  }, []);
+};
+```
+
+### 13.6 Database Connection Optimization
+
+**Connection Pooling:**
+```typescript
+// Optimized Prisma configuration
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL
+    }
+  },
+  log: process.env.NODE_ENV === 'development' ? ['query', 'error'] : ['error']
+});
+
+// Connection pool settings in DATABASE_URL
+const DATABASE_URL = "postgresql://user:pass@localhost:5432/db?schema=public&connection_limit=20&pool_timeout=20&socket_timeout=60";
+
+// Middleware for connection management
+export const dbMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+  req.db = prisma;
+  
+  // Ensure connection cleanup
+  res.on('finish', () => {
+    // Prisma handles connection cleanup automatically
+  });
+  
+  next();
+};
+```
+
+### 13.7 Monitoring & Performance Tracking
+
+**Performance Monitoring:**
+```typescript
+// API response time tracking
+export const performanceMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const start = Date.now();
+  
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    
+    // Log slow queries
+    if (duration > 1000) {
+      console.warn(`Slow API: ${req.method} ${req.path} took ${duration}ms`);
+    }
+    
+    // Send to monitoring service
+    analytics.track('api_performance', {
+      path: req.path,
+      method: req.method,
+      duration,
+      status: res.statusCode
+    });
+  });
+  
+  next();
+};
+
+// Client-side performance tracking
+const usePerformanceMonitoring = () => {
+  useEffect(() => {
+    // Track page load times
+    if (typeof window !== 'undefined' && 'performance' in window) {
+      const { loadEventEnd, navigationStart } = window.performance.timing;
+      const pageLoadTime = loadEventEnd - navigationStart;
+      
+      analytics.track('page_performance', {
+        load_time: pageLoadTime,
+        page: window.location.pathname
+      });
+    }
+  }, []);
+};
+```
+
+### 13.8 Performance Requirements Summary
+
+**Mandatory Speed Requirements:**
+- **Database queries:** All queries must complete in < 100ms
+- **API responses:** 95% of responses in < 500ms
+- **Page loads:** First contentful paint < 1.5s
+- **Search results:** Real-time filtering with < 200ms delay
+- **Session booking:** Immediate confirmation, background processing
+- **Mentor recommendations:** Precomputed and cached, < 300ms response
+
+**User Experience Guidelines:**
+- **No loading spinners** for operations under 200ms
+- **Skeleton screens** for operations 200ms-1s
+- **Progress indicators** for operations > 1s
+- **Optimistic updates** for all user actions
+- **Background sync** for non-critical operations
+- **Offline support** for core features
+- **Error recovery** without page refresh
+
+**Implementation Priority:**
+1. **Week 1-2:** Database optimization and indexing
+2. **Week 3-4:** API caching and response optimization
+3. **Week 5-6:** Frontend performance and lazy loading
+4. **Week 7-8:** Real-time features and background processing
+
+---
+
+## 11. Development Checklist
+
+### 11.1 Must-Have Features (MVP)
+- [ ] Student registration with academic profiling (school/college only)
+- [ ] Language preference selection and matching system
+- [ ] Enhanced mentor profiles with language and specialization info
+- [ ] Smart matching algorithm based on academic level, field, and language
+- [ ] Advanced search and filtering with language filters
+- [ ] Simplified booking system (no document upload required)
+- [ ] Pre-session questionnaire for context collection
+- [ ] Zoom SDK integration for reliable video calls with language support
+- [ ] Multi-language session support (conduct sessions in preferred language)
+- [ ] Role-based access (Student, Mentor, Admin, Support)
+- [ ] Progress tracking and academic milestone management
+- [ ] Admin panel with mentor verification and language management
+- [ ] Rating and review system with language-specific feedback
+- [ ] Payment system with regional language support
+
+### 11.2 Phase 2 Features (Post-MVP)
+- [ ] Mobile applications with multi-language support
+- [ ] AI-powered mentor recommendations based on language and progress
+- [ ] Group mentoring sessions in regional languages
+- [ ] Academic resource library in multiple languages
+- [ ] University and institution partnerships for regional reach
+- [ ] Exam preparation modules in local languages (JEE, NEET, state boards)
+- [ ] Career path visualization with regional opportunities
+- [ ] Language-specific career guidance (regional job markets)
+- [ ] Parent/guardian dashboard with language preferences
+- [ ] Regional scholarship and opportunity recommendations
+- [ ] Integration with regional education boards
+- [ ] Voice-based session booking in regional languages
+
+**Language Support Priority:**
+1. **Phase 1:** Hindi, English, Telugu (for Andhra Pradesh launch)
+2. **Phase 2:** Tamil, Bengali, Marathi, Gujarati
+3. **Phase 3:** Kannada, Malayalam, Punjabi, Odia
+4. **Global:** Spanish, French, Mandarin (for international expansion)
+
+---
+
+## 12. Next.js 14 Production Structure (App Router)
+
+```
+mentorship-platform/
+├── src/
+│   ├── app/ (App Router - Next.js 14)
+│   │   ├── (auth)/ (Route groups)
+│   │   │   ├── login/
+│   │   │   │   └── page.tsx
+│   │   │   ├── register/
+│   │   │   │   └── page.tsx
+│   │   │   └── layout.tsx (Auth layout)
+│   │   ├── (dashboard)/ (Protected routes)
+│   │   │   ├── dashboard/
+│   │   │   │   ├── student/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── professional/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── mentor/
+│   │   │   │       └── page.tsx
+│   │   │   ├── profile/
+│   │   │   │   ├── academic/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── career-goals/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── documents/
+│   │   │   │       └── page.tsx
+│   │   │   └── layout.tsx (Dashboard layout)
+│   │   ├── mentors/
+│   │   │   ├── page.tsx (Search page)
+│   │   │   ├── [slug]/
+│   │   │   │   └── page.tsx (Mentor profile)
+│   │   │   └── recommendations/
+│   │   │       └── page.tsx
+│   │   ├── sessions/
+│   │   │   ├── book/
+│   │   │   │   └── [mentorId]/
+│   │   │   │       └── page.tsx
+│   │   │   ├── [sessionId]/
+│   │   │   │   ├── page.tsx (Video call)
+│   │   │   │   ├── pre-session/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── post-session/
+│   │   │   │       └── page.tsx
+│   │   │   └── history/
+│   │   │       └── page.tsx
+│   │   ├── onboarding/
+│   │   │   ├── academic-level/
+│   │   │   │   └── page.tsx
+│   │   │   ├── school-profile/
+│   │   │   │   └── page.tsx
+│   │   │   ├── college-profile/
+│   │   │   │   └── page.tsx
+│   │   │   ├── professional-profile/
+│   │   │   │   └── page.tsx
+│   │   │   ├── goals-assessment/
+│   │   │   │   └── page.tsx
+│   │   │   └── completion/
+│   │   │       └── page.tsx
+│   │   ├── api/ (API Routes)
+│   │   │   ├── auth/
+│   │   │   │   ├── register/
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── [...nextauth]/
+│   │   │   │       └── route.ts
+│   │   │   ├── users/
+│   │   │   │   ├── profile/
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── academic-details/
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── recommendations/
+│   │   │   │       └── route.ts
+│   │   │   ├── mentors/
+│   │   │   │   ├── search/
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── [id]/
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── apply/
+│   │   │   │       └── route.ts
+│   │   │   ├── sessions/
+│   │   │   │   ├── book/
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── [id]/
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── pre-session/
+│   │   │   │       └── route.ts
+│   │   │   ├── payments/
+│   │   │   │   ├── create-intent/
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── confirm/
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── webhook/
+│   │   │   │       └── route.ts
+│   │   │   ├── uploads/
+│   │   │   │   ├── documents/
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── images/
+│   │   │   │       └── route.ts
+│   │   │   └── matching/
+│   │   │       ├── algorithm/
+│   │   │       │   └── route.ts
+│   │   │       └── recommendations/
+│   │   │           └── route.ts
+│   │   ├── globals.css (Global styles)
+│   │   ├── layout.tsx (Root layout)
+│   │   ├── page.tsx (Homepage)
+│   │   ├── loading.tsx (Global loading UI)
+│   │   ├── error.tsx (Global error UI)
+│   │   └── not-found.tsx (404 page)
+│   ├── components/
+│   │   ├── ui/ (Shadcn/ui components)
+│   │   │   ├── button.tsx
+│   │   │   ├── input.tsx
+│   │   │   ├── modal.tsx
+│   │   │   ├── form.tsx
+│   │   │   └── index.ts
+│   │   ├── forms/
+│   │   │   ├── DynamicAcademicForm.tsx
+│   │   │   ├── PreSessionForm.tsx
+│   │   │   ├── DocumentUpload.tsx
+│   │   │   └── GoalsSelector.tsx
+│   │   ├── layout/
+│   │   │   ├── Header.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   ├── Sidebar.tsx
+│   │   │   └── Navigation.tsx
+│   │   ├── onboarding/
+│   │   │   ├── AcademicLevelSelector.tsx
+│   │   │   ├── SchoolProfileForm.tsx
+│   │   │   ├── CollegeProfileForm.tsx
+│   │   │   ├── ProfessionalProfileForm.tsx
+│   │   │   └── ProgressStepper.tsx
+│   │   ├── mentors/
+│   │   │   ├── MentorCard.tsx
+│   │   │   ├── MentorProfile.tsx
+│   │   │   ├── AdvancedFilters.tsx
+│   │   │   ├── CompatibilityScore.tsx
+│   │   │   └── RecommendationsList.tsx
+│   │   ├── sessions/
+│   │   │   ├── BookingCalendar.tsx
+│   │   │   ├── VideoCall.tsx
+│   │   │   ├── SessionNotes.tsx
+│   │   │   ├── ProgressTracker.tsx
+│   │   │   └── FollowUpTasks.tsx
+│   │   └── dashboard/
+│   │       ├── AcademicProgress.tsx
+│   │       ├── CareerMilestones.tsx
+│   │       ├── UpcomingSessions.tsx
+│   │       └── QuickActions.tsx
+│   ├── lib/
+│   │   ├── prisma.ts (Database connection)
+│   │   ├── auth.ts (NextAuth configuration)
+│   │   ├── stripe.ts (Payment handling)
+│   │   ├── zoom.ts (Video call integration)
+│   │   ├── utils.ts (Utility functions)
+│   │   ├── validations.ts (Zod schemas)
+│   │   ├── constants.ts (App constants)
+│   │   ├── api-client.ts (API client)
+│   │   └── matching-algorithm.ts
+│   ├── hooks/
+│   │   ├── useAuth.ts
+│   │   ├── useMentors.ts
+│   │   ├── useSessions.ts
+│   │   ├── useLocalStorage.ts
+│   │   └── useOnboarding.ts
+│   ├── store/ (Zustand for state management)
+│   │   ├── authStore.ts
+│   │   ├── userStore.ts
+│   │   ├── mentorStore.ts
+│   │   └── onboardingStore.ts
+│   ├── types/
+│   │   ├── user.ts
+│   │   ├── mentor.ts
+│   │   ├── session.ts
+│   │   ├── academic.ts
+│   │   └── index.ts
+│   └── middleware.ts (Route protection)
+├── prisma/
+│   ├── schema.prisma
+│   ├── migrations/
+│   └── seed.ts
+├── public/
+│   ├── images/
+│   ├── icons/
+│   ├── documents/
+│   └── favicon.ico
+├── docs/
+│   ├── api.md
+│   ├── deployment.md
+│   └── database.md
+├── tests/
+│   ├── __mocks__/
+│   ├── components/
+│   ├── pages/
+│   └── utils/
+├── .env.local
+├── .env.example
+├── .gitignore
+├── next.config.js
+├── tailwind.config.ts
+├── tsconfig.json
+├── components.json (Shadcn/ui config)
+├── package.json
+└── README.md
+```
+
+**Key Next.js 14 Features Used:**
+
+### **1. App Router Benefits**
+- **File-based routing** with layouts and route groups
+- **Server Components by default** for better performance
+- **Streaming and Suspense** for faster page loads
+- **Built-in SEO optimization** with metadata API
+- **Parallel routes** for complex UI states
+
+### **2. Modern Architecture**
+- **Route groups** `(auth)`, `(dashboard)` for layout organization
+- **Colocation** of related files in same folder
+- **TypeScript-first** with `.tsx` extensions
+- **Middleware** for authentication and route protection
+- **Server Actions** for form submissions (optional)
+
+### **3. Performance Optimizations**
+- **Automatic code splitting** per route
+- **Image optimization** with next/image
+- **Font optimization** with next/font
+- **Bundle analyzer** ready configuration
+- **Static generation** where possible
+
+### **4. Developer Experience**
+- **Hot reload** and fast refresh
+- **Error boundaries** with error.tsx files
+- **Loading states** with loading.tsx files
+- **TypeScript integration** out of the box
+- **ESLint and Prettier** ready
+
+**Tech Stack Summary for Next.js 14:**
+```json
+{
+  "framework": "Next.js 14.2.x",
+  "language": "TypeScript",
+  "styling": "Tailwind CSS + Shadcn/ui",
+  "database": "PostgreSQL + Prisma",
+  "auth": "NextAuth.js v5",
+  "payments": "Stripe",
+  "video": "Zoom SDK",
+  "state": "Zustand",
+  "validation": "Zod",
+  "testing": "Jest + React Testing Library",
+  "deployment": "Vercel"
+}
+```
+
+## 14. Security, Compliance & Data Protection
+
+### 14.1 Data Security Requirements
+
+**Authentication & Authorization:**
+```typescript
+// Multi-factor authentication for sensitive operations
+interface AuthConfig {
+  password_requirements: {
+    min_length: 8;
+    require_uppercase: true;
+    require_lowercase: true;
+    require_numbers: true;
+    require_special_chars: true;
+  };
+  session_management: {
+    max_sessions_per_user: 3;
+    session_timeout: 24; // hours
+    require_mfa_for: ['payment', 'profile_changes', 'admin_actions'];
+  };
+  rate_limiting: {
+    login_attempts: 5;
+    lockout_duration: 15; // minutes
+    api_requests: 100; // per minute
+  };
+}
+
+// Role-based access control
+enum UserPermissions {
+  VIEW_PROFILE = 'view_profile',
+  EDIT_PROFILE = 'edit_profile',
+  BOOK_SESSIONS = 'book_sessions',
+  MANAGE_AVAILABILITY = 'manage_availability',
+  VERIFY_MENTORS = 'verify_mentors',
+  ACCESS_ANALYTICS = 'access_analytics',
+  MANAGE_PAYMENTS = 'manage_payments'
+}
+```
+
+**Data Encryption Standards:**
+- **At Rest:** AES-256 encryption for all sensitive data
+- **In Transit:** TLS 1.3 for all API communications
+- **Database:** Encrypted database connections with certificate validation
+- **File Storage:** Server-side encryption for all uploaded files
+- **Session Recordings:** End-to-end encryption with user-controlled access
+
+### 14.2 Privacy & Compliance
+
+**GDPR Compliance (for Global Expansion):**
+- **Data Minimization:** Collect only necessary data for service provision
+- **Consent Management:** Explicit consent for data processing and marketing
+- **Right to Access:** Users can download all their data in standard format
+- **Right to Deletion:** Complete data removal within 30 days of request
+- **Data Portability:** Export user data in machine-readable format
+- **Privacy by Design:** Privacy considerations in all feature development
+
+**Indian Data Protection:**
+- **Data Localization:** All Indian user data stored within India
+- **Consent Framework:** Clear consent for data sharing with mentors
+- **Minor Protection:** Special protections for users under 18
+- **Cross-Border Transfer:** Explicit consent for international mentor sessions
+
+```typescript
+interface DataRetentionPolicy {
+  user_profiles: '7 years after account deletion';
+  session_recordings: '2 years after session completion';
+  payment_records: '7 years for tax compliance';
+  chat_logs: '1 year after session completion';
+  audit_logs: '5 years for security compliance';
+  marketing_data: 'Until consent withdrawal';
+}
+```
+
+### 14.3 Child Safety & Protection
+
+**Enhanced Protection for Minors:**
+- **Age Verification:** Mandatory age verification during registration
+- **Parental Consent:** Required for users under 16
+- **Session Monitoring:** All sessions with minors are recorded
+- **Mentor Screening:** Enhanced background checks for mentors working with minors
+- **Content Filtering:** AI-powered inappropriate content detection
+- **Reporting System:** Easy reporting mechanism for inappropriate behavior
+
+**Safety Features:**
+```typescript
+interface ChildSafetyFeatures {
+  mandatory_recording: boolean; // true for users under 18
+  parental_dashboard: boolean; // true for users under 16
+  content_monitoring: 'real_time' | 'post_session' | 'both';
+  emergency_contact: string; // required for minors
+  session_supervision: boolean; // optional parental supervision
+}
+```
+
+### 14.4 Platform Security Measures
+
+**Fraud Prevention:**
+- **Identity Verification:** Government ID verification for all mentors
+- **Payment Fraud Detection:** AI-based transaction monitoring
+- **Account Verification:** Email and phone verification mandatory
+- **Behavioral Analysis:** Unusual activity pattern detection
+- **Review Authenticity:** AI detection of fake reviews and ratings
+
+**Content Moderation:**
+- **AI Content Scanning:** Real-time inappropriate content detection
+- **Human Review Queue:** Flagged content reviewed by human moderators
+- **Community Reporting:** Easy reporting system for users
+- **Automated Actions:** Temporary suspension for policy violations
+- **Appeal Process:** Fair review process for disputed actions
+
+### 14.5 Business Continuity & Disaster Recovery
+
+**Backup Strategy:**
+```typescript
+interface BackupPolicy {
+  database: {
+    frequency: 'hourly';
+    retention: '90 days';
+    geo_replication: true;
+    encryption: 'AES-256';
+  };
+  file_storage: {
+    frequency: 'real_time';
+    retention: '1 year';
+    cross_region: true;
+  };
+  configuration: {
+    frequency: 'on_change';
+    version_control: true;
+  };
+}
+```
+
+**Incident Response Plan:**
+1. **Detection** → Automated monitoring alerts
+2. **Assessment** → Impact and severity evaluation  
+3. **Containment** → Immediate threat isolation
+4. **Eradication** → Root cause elimination
+5. **Recovery** → Service restoration with monitoring
+6. **Lessons Learned** → Post-incident review and improvements
+
+**Service Level Agreements:**
+- **Uptime Target:** 99.9% availability (8# Mentorship Platform - Development PRD
+**For Cursor AI & Development Team**
+
+## 1. Tech Stack Decision
+
+### 1.1 Video Calling Recommendation
+**Use Zoom SDK (Not WebRTC)**
+- **Why:** Enterprise-grade reliability, proven at scale
+- **Reality Check:** WebRTC is complex, requires significant infrastructure
+- **Benefits:** Battle-tested, handles poor network conditions, extensive documentation
+- **Trade-off:** External dependency but worth it for reliability
+
+### 1.2 Core Technology Stack
+**Full-Stack Next.js (Most Stable & Scalable)**
+- **Frontend + Backend:** Next.js 14 with TypeScript
+- **Database:** PostgreSQL with Prisma ORM
+- **Authentication:** NextAuth.js (battle-tested)
+- **Video:** Zoom SDK (most reliable)
+- **Payments:** Stripe (global standard)
+- **Storage:** AWS S3 (industry standard)
+- **Deployment:** Vercel (optimized for Next.js)
+
+**Why This Stack:**
+- **Next.js:** Mature framework, huge community, regular but stable updates
+- **PostgreSQL:** Most reliable database, excellent for complex queries
+- **Stripe:** Global payment leader, best documentation
+- **AWS S3:** Industry standard, never goes down
+- **Zoom SDK:** Most reliable video solution for business apps
+
+---
+
+## 2. Database Schema
+
+### 2.1 Core Tables
+```sql
+-- Users table (Students only - no professionals)
+users (
+  id, email, phone, name, password_hash, 
+  profile_image, date_of_birth, gender,
+  city, state, country, timezone,
+  current_grade, academic_level, institution_name,
+  field_of_study, graduation_year, gpa_score,
+  interests[], career_goals[], preferred_industries[],
+  primary_language, languages_spoken[], linkedin_url,
+  created_at, updated_at, is_verified, onboarding_completed,
+  last_active, account_status, parent_email
+)
+
+-- Academic Details table (School and College students only)
+academic_details (
+  id, user_id, academic_level,
+  -- School Students
+  school_name, board, class_grade, stream,
+  subjects[], extracurricular[],
+  -- College Students  
+  university_name, degree_type, major, minor,
+  semester, cgpa, projects[], internships[],
+  -- Common fields
+  achievements[], goals[], challenges[],
+  created_at, updated_at
+)
+
+-- Career Preferences table
+career_preferences (
+  id, user_id, preferred_roles[], target_companies[],
+  desired_locations[], work_preferences, career_timeline,
+  specific_concerns[], created_at, updated_at
+)
+
+-- Mentors table (Enhanced with language support)
+mentors (
+  id, user_id, title, university, company, 
+  experience_years, expertise_areas[], 
+  academic_specializations[], industry_focus[],
+  student_levels_served[], hourly_rate, bio, 
+  linkedin_url, verification_status, verification_docs[], 
+  verification_notes, verified_by, verified_at,
+  rejection_reason, total_sessions, avg_rating, response_time,
+  primary_language, languages_spoken[], timezone, 
+  is_active, mentor_type, performance_score,
+  payout_details, tax_information, background_check_status
+)
+
+-- Enhanced Verification System
+mentor_verification (
+  id, mentor_id, verification_type, document_type,
+  document_url, verification_status, submitted_at,
+  reviewed_by, reviewed_at, rejection_reason,
+  expiry_date, auto_reverify_date
+)
+
+-- User Roles table (Student, Mentor, Admin, Support)
+user_roles (
+  id, user_id, role_type, permissions[],
+  assigned_by, assigned_at, is_active
+)
+
+-- Admin/Support Users table
+admin_users (
+  id, user_id, admin_type, department,
+  permissions[], managed_regions[],
+  managed_languages[], created_at
+)
+
+-- Language Support table
+languages (
+  id, language_code, language_name, 
+  is_active, region, native_speakers_count
+)
+
+-- Precomputed Mentor Compatibility (for performance)
+mentor_compatibility (
+  id, mentor_id, student_segment, base_score,
+  language_score, academic_score, location_score,
+  last_computed, is_active
+)
+
+-- Enhanced Sessions table
+sessions (
+  id, user_id, mentor_id, scheduled_at, 
+  duration, amount, status, payment_id,
+  session_type, session_language, user_questions[], 
+  mentor_notes, video_room_id, recording_url, 
+  recording_access_expires, follow_up_tasks[], 
+  satisfaction_rating, mentor_rating, created_at,
+  cancellation_reason, rescheduled_from, conflict_resolution
+)
+
+-- Session Conflicts and Resolutions
+session_conflicts (
+  id, session_id, conflict_type, reported_by,
+  reported_at, resolution_type, resolved_by,
+  resolved_at, compensation_amount, notes
+)
+
+-- Enhanced Payments table
+payments (
+  id, session_id, user_id, mentor_id, amount,
+  platform_fee, mentor_earnings, payment_method,
+  status, payment_gateway_id, gateway_response,
+  refund_amount, refund_reason, refunded_at,
+  payout_id, payout_status, created_at
+)
+
+-- Mentor Payouts
+mentor_payouts (
+  id, mentor_id, payout_period_start, payout_period_end,
+  total_earnings, platform_fee, tax_deduction,
+  net_amount, payout_method, payout_reference,
+  status, processed_at, created_at
+)
+
+-- User Progress Tracking
+user_progress (
+  id, user_id, milestone_type, milestone_data,
+  achieved_at, mentor_id, session_id,
+  progress_notes, next_steps[]
+)
+
+-- Quality Control and Reviews
+quality_reviews (
+  id, mentor_id, review_type, reviewer_id,
+  review_date, rating, feedback, action_taken,
+  follow_up_required, created_at
+)
+
+-- Support Tickets
+support_tickets (
+  id, user_id, ticket_type, priority, status,
+  subject, description, assigned_to, created_at,
+  resolved_at, resolution_notes, satisfaction_rating
+)
+
+-- Audit Logs
+audit_logs (
+  id, user_id, action_type, resource_type, resource_id,
+  old_values, new_values, ip_address, user_agent,
+  created_at
+)
+```
+
+---
+
+## 3. Core Features for Development
+
+### 3.1 User Management (Students Only)
+**Student Registration & Onboarding**
+- Multi-step registration for school and college students only
+- Language preference selection during signup
+- Dynamic form fields based on academic level (school/college)
+- Location and timezone detection
+- Academic profiling without document upload
+- Language-based mentor matching
+
+**Student Onboarding Flow:**
+1. **Basic Info:** Name, email, phone, location, primary language
+2. **Academic Level:** School Student or College Student
+3. **Academic Details:** 
+   - School: Grade, board, subjects, stream
+   - College: University, degree, major, semester, CGPA
+4. **Language Preferences:** Primary language, additional languages spoken
+5. **Career Goals:** Industry preferences, target roles, timeline
+6. **Interests & Challenges:** Specific areas needing guidance
+7. **Profile Completion:** Upload photo, set preferences
+
+**Role-Based Dashboard Access:**
+- **Students:** Academic progress, mentor discovery, session booking
+- **Mentors:** Student requests, session management, earnings
+- **Admins:** Platform management, mentor verification, analytics
+- **Support:** User assistance, issue resolution, quality control
+
+### 3.2 Enhanced Mentor Verification System
+**Multi-Step Verification Process:**
+- **Document Verification:** ID proof, education certificates, experience letters
+- **Background Check:** Professional verification, criminal background check
+- **Interview Process:** Video interview with admin team
+- **Trial Session:** Mandatory trial session with platform assessment
+- **Reference Check:** Contact previous employers or academic institutions
+
+**Verification Workflow:**
+1. **Application Submitted** → Auto-acknowledgment
+2. **Document Review** (24-48 hours) → Admin verification
+3. **Background Check** (3-5 days) → Third-party verification
+4. **Interview Scheduling** → 30-minute video interview
+5. **Trial Session** → Supervised session with feedback
+6. **Final Approval/Rejection** → Decision with detailed feedback
+7. **Ongoing Monitoring** → Quarterly performance reviews
+
+**Quality Control Measures:**
+- **Performance Thresholds:** Minimum 4.0 rating, 90% session completion
+- **Student Feedback Monitoring:** Automatic review for ratings below 3.5
+- **Regular Audits:** Random session quality checks
+- **Mentor Training:** Mandatory monthly training sessions
+- **Suspension Protocol:** Clear guidelines for temporary/permanent suspensions
+
+**Verification Status Types:**
+```typescript
+enum VerificationStatus {
+  PENDING = 'pending',
+  DOCUMENTS_UNDER_REVIEW = 'documents_under_review',
+  BACKGROUND_CHECK_IN_PROGRESS = 'background_check_in_progress',
+  INTERVIEW_SCHEDULED = 'interview_scheduled',
+  TRIAL_SESSION_REQUIRED = 'trial_session_required',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  SUSPENDED = 'suspended',
+  REAPPLICATION_REQUIRED = 'reapplication_required'
+}
+```
+
+### 3.3 Language-Based Matching & Discovery System
+**Smart Language Matching Algorithm**
+- Primary language compatibility (Hindi, English, Telugu, Tamil, etc.)
+- Multi-language support for bilingual sessions
+- Regional mentor preferences
+- Cultural context consideration
+- Language proficiency levels matching
+
+**Enhanced Discovery Features:**
+- **Academic Level Filters:** School students, college students
+- **Language Filters:** Primary language, additional languages
+- **Subject/Field Filters:** Engineering, Medicine, Business, Arts, etc.
+- **Experience Filters:** Industry experience, academic background
+- **Location Filters:** Same city, same state, timezone compatibility
+- **Specialization Search:** Specific areas like "Data Science," "NEET preparation," "Engineering entrance"
+
+**Language-Aware Recommendations:**
+- Algorithm considering user's language preferences and academic profile
+- Regional mentors who understand local education systems
+- Language-specific career guidance (e.g., regional opportunities)
+- Cultural context in career advice
+
+### 3.4 Simplified Booking System (No Documents Required)
+**Streamlined Pre-Session Information:**
+- Session purpose and specific questions
+- Current academic challenges
+- Expected outcomes from the session
+- Preferred session language
+- Previous session follow-up (if applicable)
+
+**Session Booking Flow:**
+1. Student selects mentor from language-filtered recommendations
+2. Views mentor profile with language compatibility
+3. Fills simple pre-session questionnaire
+4. Selects session type (Academic guidance, Career counseling, Exam prep)
+5. Chooses preferred language for the session
+6. Selects available time slot and duration
+7. Makes payment - no document upload required
+8. Receives booking confirmation in preferred language
+
+**Calendar & Scheduling:**
+- Timezone-aware scheduling
+- Language preference consideration
+- Google Calendar sync for both parties
+- Automatic reminders in user's preferred language
+- Reschedule/cancel with academic calendar consideration
+- Exam season priority booking
+
+### 3.5 Enhanced Payment & Financial System
+**Payment Processing:**
+- **Multiple Payment Methods:** UPI, cards, net banking, digital wallets
+- **Regional Payment Support:** Local payment methods for different states
+- **Installment Options:** EMI for expensive sessions or packages
+- **Currency Support:** Multi-currency for international expansion
+- **Tax Compliance:** Automatic tax calculation and invoice generation
+
+**Revenue Split & Payouts:**
+- **Commission Structure:** 30% platform fee, 70% to mentor
+- **Payout Schedule:** Weekly payouts for mentors
+- **Minimum Payout:** ₹1,000 minimum for payout processing
+- **Payment Methods:** Bank transfer, UPI, digital wallets
+- **Tax Documentation:** TDS certificates, GST compliance
+
+**Refund & Conflict Resolution:**
+- **Automatic Refunds:** Full refund if mentor cancels within 2 hours of session
+- **Partial Refunds:** 50% refund for cancellations 2-24 hours before
+- **No-Show Policy:** Full charge if student doesn't attend without notice
+- **Quality Disputes:** Refund process for unsatisfactory sessions
+- **Emergency Rescheduling:** Free rescheduling for emergencies with proof
+
+**Financial Security:**
+- **Escrow System:** Payments held until session completion
+- **Fraud Detection:** AI-based fraud monitoring
+- **PCI Compliance:** Secure payment processing standards
+- **Data Encryption:** All financial data encrypted at rest and transit
+
+```typescript
+interface PaymentFlow {
+  session_id: string;
+  amount: number;
+  platform_fee: number;
+  mentor_earnings: number;
+  payment_method: string;
+  escrow_release_date: Date;
+  refund_policy: RefundPolicy;
+}
+
+enum RefundPolicy {
+  FULL_REFUND = 'full_refund',
+  PARTIAL_REFUND = 'partial_refund', 
+  NO_REFUND = 'no_refund',
+  DISPUTE_RESOLUTION = 'dispute_resolution'
+}
+```
+
+---
+
+## 4. API Endpoints Structure
+
+### 4.1 Production-Grade API Structure with Security
+```
+src/app/api/
+├── auth/
+│   ├── register/route.ts (Student registration)
+│   ├── mentor-register/route.ts (Mentor registration)
+│   ├── verify-email/route.ts (Email verification)
+│   ├── verify-otp/route.ts (OTP verification)
+│   ├── reset-password/route.ts (Password reset)
+│   └── [...nextauth]/route.ts (NextAuth handler)
+├── users/
+│   ├── profile/route.ts (GET, PUT user profile)
+│   ├── academic-details/route.ts (GET, PUT academic info)
+│   ├── language-preferences/route.ts (GET, PUT languages)
+│   ├── progress/route.ts (GET user progress)
+│   ├── deactivate/route.ts (POST account deactivation)
+│   └── [id]/route.ts (GET specific user - admin only)
+├── mentors/
+│   ├── route.ts (GET all mentors with filters)
+│   ├── search/route.ts (POST advanced search)
+│   ├── [id]/route.ts (GET specific mentor profile)
+│   ├── apply/route.ts (POST mentor application)
+│   ├── availability/route.ts (GET, PUT mentor availability)
+│   ├── languages/route.ts (GET mentors by language)
+│   ├── verification/
+│   │   ├── route.ts (GET verification status)
+│   │   ├── documents/route.ts (POST upload verification docs)
+│   │   ├── approve/route.ts (PUT approve mentor - admin)
+│   │   ├── reject/route.ts (PUT reject mentor - admin)
+│   │   └── resubmit/route.ts (POST resubmit application)
+│   ├── performance/route.ts (GET mentor performance metrics)
+│   └── payouts/route.ts (GET mentor payout history)
+├── sessions/
+│   ├── route.ts (GET user sessions, POST book session)
+│   ├── [id]/
+│   │   ├── route.ts (GET, PUT, DELETE specific session)
+│   │   ├── notes/route.ts (POST session notes)
+│   │   ├── recording/route.ts (GET session recording access)
+│   │   ├── reschedule/route.ts (PUT reschedule session)
+│   │   └── cancel/route.ts (PUT cancel session)
+│   ├── upcoming/route.ts (GET upcoming sessions)
+│   ├── history/route.ts (GET session history)
+│   ├── conflicts/route.ts (POST report conflict)
+│   └── emergency/route.ts (POST emergency support)
+├── matching/
+│   ├── recommendations/route.ts (GET personalized recommendations)
+│   ├── compatibility/route.ts (POST compatibility score)
+│   ├── language-match/route.ts (GET language-based matches)
+│   ├── precompute/route.ts (POST trigger compatibility recomputation)
+│   └── filters/route.ts (GET available filter options)
+├── payments/
+│   ├── create-intent/route.ts (POST create payment intent)
+│   ├── confirm/route.ts (POST confirm payment)
+│   ├── webhook/route.ts (POST Stripe webhook)
+│   ├── refund/route.ts (POST process refund)
+│   ├── dispute/route.ts (POST payment dispute)
+│   └── history/route.ts (GET payment history)
+├── admin/
+│   ├── mentors/
+│   │   ├── route.ts (GET all mentors - admin)
+│   │   ├── verification/route.ts (GET pending verifications)
+│   │   ├── performance/route.ts (GET performance reports)
+│   │   └── suspend/route.ts (PUT suspend mentor)
+│   ├── users/route.ts (GET all users - admin)
+│   ├── sessions/
+│   │   ├── route.ts (GET all sessions - admin)
+│   │   ├── conflicts/route.ts (GET session conflicts)
+│   │   └── quality-review/route.ts (POST quality review)
+│   ├── analytics/
+│   │   ├── dashboard/route.ts (GET platform analytics)
+│   │   ├── revenue/route.ts (GET revenue analytics)
+│   │   ├── usage/route.ts (GET usage statistics)
+│   │   └── performance/route.ts (GET performance metrics)
+│   ├── languages/route.ts (GET, POST manage languages)
+│   └── payouts/route.ts (GET, POST process mentor payouts)
+├── support/
+│   ├── tickets/
+│   │   ├── route.ts (GET, POST support tickets)
+│   │   ├── [id]/route.ts (GET, PUT specific ticket)
+│   │   ├── escalate/route.ts (PUT escalate ticket)
+│   │   └── close/route.ts (PUT close ticket)
+│   ├── chat/route.ts (POST support chat)
+│   ├── emergency/route.ts (POST emergency support)
+│   └── feedback/route.ts (POST platform feedback)
+├── uploads/
+│   ├── profile-images/route.ts (POST upload profile image)
+│   ├── verification-docs/route.ts (POST mentor verification docs)
+│   └── session-recordings/route.ts (GET access session recordings)
+├── notifications/
+│   ├── route.ts (GET user notifications)
+│   ├── mark-read/route.ts (PUT mark notifications as read)
+│   ├── preferences/route.ts (GET, PUT notification preferences)
+│   └── push/route.ts (POST send push notification)
+└── health/
+    ├── route.ts (GET system health check)
+    ├── database/route.ts (GET database health)
+    └── services/route.ts (GET third-party services health)
+```
+
+**API Security Enhancements:**
+```typescript
+// Rate limiting middleware
+export const rateLimitConfig = {
+  '/api/auth/*': { requests: 5, window: '15m' },
+  '/api/sessions/book': { requests: 3, window: '1m' },
+  '/api/mentors/search': { requests: 20, window: '1m' },
+  '/api/payments/*': { requests: 10, window: '5m' }
+};
+
+// Authentication middleware
+export const authMiddleware = {
+  public: ['/api/auth/*', '/api/mentors/search'],
+  protected: ['/api/users/*', '/api/sessions/*'],
+  admin: ['/api/admin/*'],
+  mentor: ['/api/mentors/availability', '/api/mentors/payouts']
+};
+
+// Input validation schemas
+export const validationSchemas = {
+  sessionBooking: z.object({
+    mentor_id: z.string().uuid(),
+    scheduled_at: z.date().min(new Date()),
+    duration: z.enum(['30', '60', '90']),
+    session_language: z.string().min(2)
+  })
+};
+```
+
+---
+
+## 5. Frontend Components Structure
+
+### 5.1 Production-Grade Component Structure
+```
+src/components/
+├── ui/ (Shadcn/ui - Industry standard)
+│   ├── button.tsx
+│   ├── input.tsx
+│   ├── select.tsx
+│   ├── modal.tsx
+│   ├── form.tsx
+│   ├── card.tsx
+│   ├── badge.tsx
+│   ├── avatar.tsx
+│   ├── dropdown-menu.tsx
+│   ├── calendar.tsx
+│   └── index.ts (Barrel exports)
+├── forms/ (Reusable form components)
+│   ├── AcademicProfileForm.tsx
+│   ├── LanguageSelector.tsx
+│   ├── PreSessionForm.tsx
+│   ├── MentorApplicationForm.tsx
+│   └── ContactForm.tsx
+├── layout/ (Layout components)
+│   ├── Header.tsx
+│   ├── Footer.tsx
+│   ├── Sidebar.tsx
+│   ├── Navigation.tsx
+│   ├── AuthLayout.tsx
+│   ├── DashboardLayout.tsx
+│   └── AdminLayout.tsx
+├── onboarding/ (Student onboarding)
+│   ├── AcademicLevelSelector.tsx
+│   ├── SchoolProfileForm.tsx
+│   ├── CollegeProfileForm.tsx
+│   ├── LanguagePreferences.tsx
+│   ├── GoalsAssessment.tsx
+│   └── ProgressStepper.tsx
+├── mentors/ (Mentor-related components)
+│   ├── MentorCard.tsx
+│   ├── MentorProfile.tsx
+│   ├── MentorGrid.tsx
+│   ├── MentorFilters.tsx
+│   ├── LanguageCompatibility.tsx
+│   ├── AvailabilityCalendar.tsx
+│   └── RecommendationsList.tsx
+├── sessions/ (Session management)
+│   ├── BookingCalendar.tsx
+│   ├── SessionCard.tsx
+│   ├── VideoCallInterface.tsx
+│   ├── SessionNotes.tsx
+│   ├── SessionHistory.tsx
+│   └── RescheduleModal.tsx
+├── dashboard/ (Dashboard components)
+│   ├── StudentDashboard.tsx
+│   ├── MentorDashboard.tsx
+│   ├── AdminDashboard.tsx
+│   ├── ProgressTracker.tsx
+│   ├── UpcomingSessions.tsx
+│   ├── QuickActions.tsx
+│   └── LanguageStats.tsx
+├── admin/ (Admin-only components)
+│   ├── MentorVerification.tsx
+│   ├── UserManagement.tsx
+│   ├── AnalyticsDashboard.tsx
+│   ├── LanguageManagement.tsx
+│   └── SupportTickets.tsx
+├── common/ (Shared components)
+│   ├── LoadingSpinner.tsx
+│   ├── ErrorBoundary.tsx
+│   ├── EmptyState.tsx
+│   ├── ConfirmDialog.tsx
+│   ├── ImageUpload.tsx
+│   ├── LanguageSwitcher.tsx
+│   └── SearchBar.tsx
+└── providers/ (Context providers)
+    ├── AuthProvider.tsx
+    ├── LanguageProvider.tsx
+    ├── ThemeProvider.tsx
+    └── QueryProvider.tsx
+```
+
+**Component Architecture Best Practices:**
+- **Atomic Design Pattern** with ui → components → pages hierarchy
+- **Single Responsibility** - each component has one clear purpose
+- **Composition over Inheritance** using React patterns
+- **TypeScript interfaces** for all component props
+- **Barrel exports** for clean imports
+- **Error boundaries** for graceful error handling
+- **Responsive design** with Tailwind CSS
+- **Accessibility** following WCAG guidelines
+
+---
+
+## 6. Development Phases
+
+### 6.1 Phase 1 (Weeks 1-4): Foundation + Enhanced Onboarding
+**Backend Setup:**
+- Database schema with academic profiling
+- User authentication with multi-step onboarding
+- Dynamic form generation API
+- Document upload system
+- Basic admin panel for mentor verification
+
+**Frontend Setup:**
+- Next.js project with enhanced user flows
+- Multi-step registration with academic level detection
+- Dynamic form components based on user type
+- Document upload interface
+- Basic dashboard layouts for different user types
+
+### 6.2 Phase 2 (Weeks 5-8): Advanced Matching + Profiles
+**Enhanced Matching System:**
+- Comprehensive mentor-student compatibility algorithm
+- Advanced search and filtering system
+- Location and timezone-based recommendations
+- Academic level and field-specific matching
+
+**Profile Systems:**
+- Enhanced mentor profiles with specializations
+- Student/professional profiles with academic tracking
+- Progress monitoring system
+- Document verification workflows
+
+### 6.3 Phase 3 (Weeks 9-12): Sessions + Analytics
+**Session Management:**
+- Pre-session questionnaire system
+- Enhanced booking with academic context
+- Post-session progress tracking
+- Follow-up task management
+
+**Analytics & Intelligence:**
+- User progress tracking dashboard
+- Success metrics and milestone tracking
+- Recommendation engine refinement
+- Academic calendar integration
+
+---
+
+## 7. Key Implementation Details
+
+### 7.1 Mentor Profile Page Structure
+```jsx
+// Mentor Profile Page Layout
+<MentorProfile>
+  <ProfileHeader>
+    <ProfileImage />
+    <BasicInfo />
+    <RatingStats />
+    <BookNowButton />
+  </ProfileHeader>
+  
+  <ProfileContent>
+    <AboutSection />
+    <ExperienceSection />
+    <SkillsSection />
+    <ReviewsSection />
+    <AvailabilitySection />
+  </ProfileContent>
+</MentorProfile>
+```
+
+### 7.2 Enhanced Language-Aware Matching Algorithm
+```typescript
+// Comprehensive student-mentor matching with language support
+interface MatchingParams {
+  student: StudentProfile;
+  mentors: MentorProfile[];
+  languagePreference: string;
+  urgency?: 'low' | 'medium' | 'high';
+}
+
+function matchMentors({ student, mentors, languagePreference, urgency }: MatchingParams) {
+  return mentors
+    .filter(mentor => 
+      mentor.is_active && 
+      mentor.verification_status === 'approved' &&
+      mentor.student_levels_served.includes(student.academic_level)
+    )
+    .map(mentor => {
+      const scores = {
+        // Language compatibility (highest weight for Indian market)
+        languageMatch: calculateLanguageMatch(
+          student.primary_language, 
+          student.languages_spoken,
+          mentor.primary_language,
+          mentor.languages_spoken
+        ),
+        
+        // Academic level and field match
+        academicLevel: calculateAcademicLevelMatch(
+          student.academic_level, 
+          mentor.student_levels_served
+        ),
+        
+        // Subject/field expertise
+        fieldExpertise: calculateFieldMatch(
+          student.field_of_study, 
+          mentor.academic_specializations
+        ),
+        
+        // Geographic and cultural context
+        locationContext: calculateLocationMatch(
+          student.state,
+          student.city,
+          mentor.timezone,
+          mentor.managed_regions
+        ),
+        
+        // Goals alignment
+        careerGoals: calculateCareerGoalsMatch(
+          student.career_goals, 
+          mentor.expertise_areas
+        ),
+        
+        // Mentor quality metrics
+        rating: mentor.avg_rating / 5,
+        availability: mentor.response_time < 24 ? 1 : 0.5,
+        experience: Math.min(mentor.experience_years / 10, 1)
+      };
+      
+      // Weighted scoring for Indian education context
+      const weights = {
+        languageMatch: 0.30,     // Very important in India
+        academicLevel: 0.25,     // Academic compatibility
+        fieldExpertise: 0.20,    // Subject expertise
+        locationContext: 0.10,   // Regional understanding
+        careerGoals: 0.10,       // Future planning
+        rating: 0.03,            // Quality indicator
+        availability: 0.01,      // Response time
+        experience: 0.01         // Mentor experience
+      };
+      
+      const matchScore = Object.keys(scores).reduce((total, key) => {
+        return total + (scores[key] * weights[key]);
+      }, 0);
+      
+      return {
+        ...mentor,
+        matchScore,
+        languageCompatibility: scores.languageMatch,
+        compatibilityReasons: getCompatibilityReasons(scores, student)
+      };
+    })
+    .sort((a, b) => b.matchScore - a.matchScore);
+}
+
+// Language matching algorithm for Indian context
+function calculateLanguageMatch(
+  studentPrimary: string,
+  studentLanguages: string[],
+  mentorPrimary: string,
+  mentorLanguages: string[]
+): number {
+  // Perfect match for same primary language
+  if (studentPrimary === mentorPrimary) return 1.0;
+  
+  // High score if mentor speaks student's primary language
+  if (mentorLanguages.includes(studentPrimary)) return 0.9;
+  
+  // Medium score for common languages
+  const commonLanguages = studentLanguages.filter(lang => 
+    mentorLanguages.includes(lang)
+  );
+  
+  if (commonLanguages.length > 0) return 0.7;
+  
+  // English fallback (common in Indian education)
+  if (mentorLanguages.includes('English') && studentLanguages.includes('English')) {
+    return 0.6;
+  }
+  
+  return 0.2; // Minimal compatibility
+}
+
+// Simplified academic form for students only
+function generateStudentForm(academicLevel: 'school' | 'college') {
+  const forms = {
+    school: {
+      fields: [
+        'school_name', 'board', 'class_grade', 'stream', 
+        'subjects', 'extracurricular', 'primary_language'
+      ],
+      validations: {
+        class_grade: { min: 6, max: 12 },
+        subjects: { minItems: 3, maxItems: 8 },
+        primary_language: { required: true }
+      }
+    },
+    college: {
+      fields: [
+        'university_name', 'degree_type', 'major', 'minor', 
+        'semester', 'cgpa', 'projects', 'primary_language'
+      ],
+      validations: {
+        semester: { min: 1, max: 10 },
+        cgpa: { min: 0, max: 10 },
+        primary_language: { required: true }
+      }
+    }
+  };
+  
+  return forms[academicLevel];
+}
+``` 'certifications'],
+      validations: {
+        experience_years: { min: 0, max: 50 },
+        skills: { minItems: 3, maxItems: 15 }
+      }
+    }
+  };
+  
+  return forms[academicLevel] || forms.school;
+}
+```
+
+### 7.3 Zoom SDK Integration
+```javascript
+// Zoom SDK implementation (more reliable than WebRTC)
+import { ZoomMtg } from '@zoomus/websdk';
+
+const createZoomMeeting = async (sessionId) => {
+  const meeting = await fetch('/api/zoom/create-meeting', {
+    method: 'POST',
+    body: JSON.stringify({
+      topic: `Mentorship Session ${sessionId}`,
+      type: 2, // Scheduled meeting
+      duration: 60,
+      settings: {
+        join_before_host: false,
+        waiting_room: true,
+        auto_recording: 'cloud'
+      }
+    })
+  });
+  return meeting.json();
+};
+```
+
+---
+
+## 8. Security & Performance
+
+### 8.1 Security Requirements
+- JWT token authentication
+- Input validation and sanitization
+- Rate limiting on APIs
+- CORS configuration
+- Secure payment processing
+- Data encryption
+
+### 8.2 Performance Optimization
+- Image optimization with Next.js
+- Database query optimization
+- Caching with Redis
+- CDN for static assets
+- Lazy loading for components
+
+---
+
+## 9. Testing Strategy
+
+### 9.1 Testing Requirements
+- Unit tests for utility functions
+- Integration tests for API endpoints
+- E2E tests for booking flow
+- Payment gateway testing
+- Video call functionality testing
+
+### 9.2 Quality Assurance
+- Code review process
+- Performance monitoring
+- Error tracking (Sentry)
+- User acceptance testing
+- Load testing for video calls
+
+---
+
+## 10. Deployment & DevOps
+
+## 13. Performance Optimization & Speed Requirements
+
+### 13.1 Database Performance Best Practices
+
+**Database Schema Optimizations:**
+```sql
+-- Optimized indexes for fast queries
+CREATE INDEX CONCURRENTLY idx_users_academic_level ON users(academic_level);
+CREATE INDEX CONCURRENTLY idx_users_primary_language ON users(primary_language);
+CREATE INDEX CONCURRENTLY idx_users_location ON users(city, state);
+CREATE INDEX CONCURRENTLY idx_mentors_active_verified ON mentors(is_active, verification_status) WHERE is_active = true;
+CREATE INDEX CONCURRENTLY idx_mentors_languages ON mentors USING GIN(languages_spoken);
+CREATE INDEX CONCURRENTLY idx_mentors_specializations ON mentors USING GIN(academic_specializations);
+CREATE INDEX CONCURRENTLY idx_mentors_rating ON mentors(avg_rating DESC, total_sessions DESC);
+CREATE INDEX CONCURRENTLY idx_sessions_user_status ON sessions(user_id, status);
+CREATE INDEX CONCURRENTLY idx_sessions_mentor_upcoming ON mentors(mentor_id) WHERE scheduled_at > NOW();
+
+-- Composite indexes for complex queries
+CREATE INDEX CONCURRENTLY idx_mentor_search ON mentors(is_active, verification_status, primary_language, avg_rating DESC);
+CREATE INDEX CONCURRENTLY idx_user_matching ON users(academic_level, primary_language, field_of_study);
+```
+
+**Query Optimization Patterns:**
+```typescript
+// Instead of N+1 queries, use efficient joins
+const getMentorsWithDetails = async (filters: MentorFilters) => {
+  return await prisma.mentor.findMany({
+    where: {
+      is_active: true,
+      verification_status: 'approved',
+      languages_spoken: { has: filters.language },
+      academic_specializations: { hasSome: filters.subjects }
+    },
+    select: {
+      id: true,
+      user: {
+        select: { name: true, profile_image: true }
+      },
+      title: true,
+      avg_rating: true,
+      total_sessions: true,
+      hourly_rate: true,
+      languages_spoken: true,
+      response_time: true
+    },
+    orderBy: [
+      { avg_rating: 'desc' },
+      { total_sessions: 'desc' }
+    ],
+    take: 20 // Pagination
+  });
+};
+
+// Use database-level filtering instead of application filtering
+const getRecommendations = async (studentId: string) => {
+  const student = await prisma.user.findUnique({
+    where: { id: studentId },
+    select: { academic_level: true, primary_language: true, field_of_study: true }
+  });
+
+  return await prisma.$queryRaw`
+    SELECT m.*, u.name, u.profile_image,
+           -- Compatibility score calculation at DB level
+           (CASE WHEN m.primary_language = ${student.primary_language} THEN 3
+                 WHEN ${student.primary_language} = ANY(m.languages_spoken) THEN 2
+                 WHEN 'English' = ANY(m.languages_spoken) THEN 1
+                 ELSE 0 END) +
+           (CASE WHEN ${student.academic_level} = ANY(m.student_levels_served) THEN 2 ELSE 0 END) +
+           (CASE WHEN ${student.field_of_study} = ANY(m.academic_specializations) THEN 2 ELSE 0 END)
+           AS compatibility_score
+    FROM mentors m
+    JOIN users u ON m.user_id = u.id
+    WHERE m.is_active = true AND m.verification_status = 'approved'
+    ORDER BY compatibility_score DESC, m.avg_rating DESC
+    LIMIT 10;
+  `;
+};
+```
+
+### 13.2 API Performance Standards
+
+**Response Time Requirements:**
+- **Search/Filter APIs:** < 200ms
+- **Mentor Recommendations:** < 300ms
+- **Booking APIs:** < 500ms
+- **Profile Updates:** < 400ms
+- **Authentication:** < 150ms
+
+**Async Pattern Implementation:**
+```typescript
+// Fast API pattern with background processing
+export async function POST(request: Request) {
+  try {
+    // 1. Quick validation and immediate response
+    const body = await request.json();
+    const validatedData = bookingSchema.parse(body);
+    
+    // 2. Fast database operations first
+    const session = await prisma.session.create({
+      data: {
+        ...validatedData,
+        status: 'pending'
+      },
+      select: { id: true, scheduled_at: true, mentor_id: true }
+    });
+
+    // 3. Return immediate response
+    const response = NextResponse.json({ 
+      sessionId: session.id, 
+      status: 'confirmed',
+      message: 'Booking confirmed! Notifications are being sent.'
+    });
+
+    // 4. Background processing (don't await)
+    processBookingAsync(session.id);
+    
+    return response;
+    
+  } catch (error) {
+    return NextResponse.json({ error: 'Booking failed' }, { status: 400 });
+  }
+}
+
+// Background processing function
+async function processBookingAsync(sessionId: string) {
+  try {
+    // Send emails, calendar invites, notifications in background
+    await Promise.allSettled([
+      sendConfirmationEmail(sessionId),
+      createCalendarEvent(sessionId),
+      sendPushNotification(sessionId),
+      updateMentorAvailability(sessionId)
+    ]);
+  } catch (error) {
+    // Log error but don't affect user experience
+    console.error('Background processing failed:', error);
+  }
+}
+```
+
+### 13.3 Caching Strategy
+
+**Multi-Level Caching:**
+```typescript
+// 1. Database query caching with Redis
+const getCachedMentors = async (cacheKey: string, queryFn: () => Promise<any>) => {
+  const cached = await redis.get(cacheKey);
+  if (cached) return JSON.parse(cached);
+  
+  const result = await queryFn();
+  await redis.setex(cacheKey, 300, JSON.stringify(result)); // 5 min cache
+  return result;
+};
+
+// 2. API response caching
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const cacheKey = `mentors:${searchParams.toString()}`;
+  
+  const mentors = await getCachedMentors(cacheKey, () => 
+    getMentorsWithFilters(Object.fromEntries(searchParams))
+  );
+  
+  return NextResponse.json(mentors, {
+    headers: {
+      'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
+    }
+  });
+}
+
+// 3. Client-side caching with React Query
+const useMentors = (filters: MentorFilters) => {
+  return useQuery({
+    queryKey: ['mentors', filters],
+    queryFn: () => fetchMentors(filters),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false
+  });
+};
+```
+
+### 13.4 Frontend Performance Patterns
+
+**Optimistic Updates:**
+```typescript
+// Immediate UI feedback with background sync
+const bookSession = useMutation({
+  mutationFn: async (bookingData) => {
+    // Optimistically update UI immediately
+    queryClient.setQueryData(['sessions'], (old) => [
+      ...old,
+      { ...bookingData, status: 'confirmed', id: 'temp-' + Date.now() }
+    ]);
+    
+    // Make API call in background
+    return api.post('/sessions/book', bookingData);
+  },
+  onError: (error, variables, context) => {
+    // Revert optimistic update on error
+    queryClient.invalidateQueries(['sessions']);
+    toast.error('Booking failed. Please try again.');
+  },
+  onSuccess: (data) => {
+    // Replace temporary data with real data
+    queryClient.invalidateQueries(['sessions']);
+    toast.success('Session booked successfully!');
+  }
+});
+```
+
+**Lazy Loading & Code Splitting:**
+```typescript
+// Component-level code splitting
+const VideoCallInterface = lazy(() => import('@/components/sessions/VideoCallInterface'));
+const AdminDashboard = lazy(() => import('@/components/admin/AdminDashboard'));
+
+// Route-level code splitting with loading states
+const SessionPage = () => {
+  return (
+    <Suspense fallback={<SessionLoadingSkeleton />}>
+      <VideoCallInterface />
+    </Suspense>
+  );
+};
+
+// Image optimization
+const MentorCard = ({ mentor }) => (
+  <Card>
+    <Image
+      src={mentor.profile_image}
+      alt={mentor.name}
+      width={200}
+      height={200}
+      placeholder="blur"
+      blurDataURL="data:image/jpeg;base64,..."
+      priority={false}
+      loading="lazy"
+    />
+  </Card>
+);
+```
+
+### 13.5 Real-time Features Without Blocking
+
+**WebSocket Integration:**
+```typescript
+// Non-blocking real-time updates
+const useRealtimeUpdates = (sessionId: string) => {
+  useEffect(() => {
+    const ws = new WebSocket(`${WS_URL}/sessions/${sessionId}`);
+    
+    ws.onmessage = (event) => {
+      const update = JSON.parse(event.data);
+      
+      // Update UI without blocking
+      queryClient.setQueryData(['session', sessionId], (old) => ({
+        ...old,
+        ...update
+      }));
+    };
+    
+    return () => ws.close();
+  }, [sessionId]);
+};
+
+// Background sync for offline support
+const useBackgroundSync = () => {
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').then((registration) => {
+        // Handle background sync
+        registration.sync.register('sync-pending-actions');
+      });
+    }
+  }, []);
+};
+```
+
+### 13.6 Database Connection Optimization
+
+**Connection Pooling:**
+```typescript
+// Optimized Prisma configuration
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL
+    }
+  },
+  log: process.env.NODE_ENV === 'development' ? ['query', 'error'] : ['error']
+});
+
+// Connection pool settings in DATABASE_URL
+const DATABASE_URL = "postgresql://user:pass@localhost:5432/db?schema=public&connection_limit=20&pool_timeout=20&socket_timeout=60";
+
+// Middleware for connection management
+export const dbMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+  req.db = prisma;
+  
+  // Ensure connection cleanup
+  res.on('finish', () => {
+    // Prisma handles connection cleanup automatically
+  });
+  
+  next();
+};
+```
+
+### 13.7 Monitoring & Performance Tracking
+
+**Performance Monitoring:**
+```typescript
+// API response time tracking
+export const performanceMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const start = Date.now();
+  
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    
+    // Log slow queries
+    if (duration > 1000) {
+      console.warn(`Slow API: ${req.method} ${req.path} took ${duration}ms`);
+    }
+    
+    // Send to monitoring service
+    analytics.track('api_performance', {
+      path: req.path,
+      method: req.method,
+      duration,
+      status: res.statusCode
+    });
+  });
+  
+  next();
+};
+
+// Client-side performance tracking
+const usePerformanceMonitoring = () => {
+  useEffect(() => {
+    // Track page load times
+    if (typeof window !== 'undefined' && 'performance' in window) {
+      const { loadEventEnd, navigationStart } = window.performance.timing;
+      const pageLoadTime = loadEventEnd - navigationStart;
+      
+      analytics.track('page_performance', {
+        load_time: pageLoadTime,
+        page: window.location.pathname
+      });
+    }
+  }, []);
+};
+```
+
+### 13.8 Performance Requirements Summary
+
+**Mandatory Speed Requirements:**
+- **Database queries:** All queries must complete in < 100ms
+- **API responses:** 95% of responses in < 500ms
+- **Page loads:** First contentful paint < 1.5s
+- **Search results:** Real-time filtering with < 200ms delay
+- **Session booking:** Immediate confirmation, background processing
+- **Mentor recommendations:** Precomputed and cached, < 300ms response
+
+**User Experience Guidelines:**
+- **No loading spinners** for operations under 200ms
+- **Skeleton screens** for operations 200ms-1s
+- **Progress indicators** for operations > 1s
+- **Optimistic updates** for all user actions
+- **Background sync** for non-critical operations
+- **Offline support** for core features
+- **Error recovery** without page refresh
+
+**Implementation Priority:**
+1. **Week 1-2:** Database optimization and indexing
+2. **Week 3-4:** API caching and response optimization
+3. **Week 5-6:** Frontend performance and lazy loading
+4. **Week 7-8:** Real-time features and background processing
+
+---
+
+## 11. Development Checklist
+
+### 11.1 Must-Have Features (MVP)
+- [ ] Student registration with academic profiling (school/college only)
+- [ ] Language preference selection and matching system
+- [ ] Enhanced mentor profiles with language and specialization info
+- [ ] Smart matching algorithm based on academic level, field, and language
+- [ ] Advanced search and filtering with language filters
+- [ ] Simplified booking system (no document upload required)
+- [ ] Pre-session questionnaire for context collection
+- [ ] Zoom SDK integration for reliable video calls with language support
+- [ ] Multi-language session support (conduct sessions in preferred language)
+- [ ] Role-based access (Student, Mentor, Admin, Support)
+- [ ] Progress tracking and academic milestone management
+- [ ] Admin panel with mentor verification and language management
+- [ ] Rating and review system with language-specific feedback
+- [ ] Payment system with regional language support
+
+### 11.2 Phase 2 Features (Post-MVP)
+- [ ] Mobile applications with multi-language support
+- [ ] AI-powered mentor recommendations based on language and progress
+- [ ] Group mentoring sessions in regional languages
+- [ ] Academic resource library in multiple languages
+- [ ] University and institution partnerships for regional reach
+- [ ] Exam preparation modules in local languages (JEE, NEET, state boards)
+- [ ] Career path visualization with regional opportunities
+- [ ] Language-specific career guidance (regional job markets)
+- [ ] Parent/guardian dashboard with language preferences
+- [ ] Regional scholarship and opportunity recommendations
+- [ ] Integration with regional education boards
+- [ ] Voice-based session booking in regional languages
+
+**Language Support Priority:**
+1. **Phase 1:** Hindi, English, Telugu (for Andhra Pradesh launch)
+2. **Phase 2:** Tamil, Bengali, Marathi, Gujarati
+3. **Phase 3:** Kannada, Malayalam, Punjabi, Odia
+4. **Global:** Spanish, French, Mandarin (for international expansion)
+
+---
+
+## 12. Next.js 14 Production Structure (App Router)
+
+```
+mentorship-platform/
+├── src/
+│   ├── app/ (App Router - Next.js 14)
+│   │   ├── (auth)/ (Route groups)
+│   │   │   ├── login/
+│   │   │   │   └── page.tsx
+│   │   │   ├── register/
+│   │   │   │   └── page.tsx
+│   │   │   └── layout.tsx (Auth layout)
+│   │   ├── (dashboard)/ (Protected routes)
+│   │   │   ├── dashboard/
+│   │   │   │   ├── student/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── professional/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── mentor/
+│   │   │   │       └── page.tsx
+│   │   │   ├── profile/
+│   │   │   │   ├── academic/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── career-goals/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── documents/
+│   │   │   │       └── page.tsx
+│   │   │   └── layout.tsx (Dashboard layout)
+│   │   ├── mentors/
+│   │   │   ├── page.tsx (Search page)
+│   │   │   ├── [slug]/
+│   │   │   │   └── page.tsx (Mentor profile)
+│   │   │   └── recommendations/
+│   │   │       └── page.tsx
+│   │   ├── sessions/
+│   │   │   ├── book/
+│   │   │   │   └── [mentorId]/
+│   │   │   │       └── page.tsx
+│   │   │   ├── [sessionId]/
+│   │   │   │   ├── page.tsx (Video call)
+│   │   │   │   ├── pre-session/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── post-session/
+│   │   │   │       └── page.tsx
+│   │   │   └── history/
+│   │   │       └── page.tsx
+│   │   ├── onboarding/
+│   │   │   ├── academic-level/
+│   │   │   │   └── page.tsx
+│   │   │   ├── school-profile/
+│   │   │   │   └── page.tsx
+│   │   │   ├── college-profile/
+│   │   │   │   └── page.tsx
+│   │   │   ├── professional-profile/
+│   │   │   │   └── page.tsx
+│   │   │   ├── goals-assessment/
+│   │   │   │   └── page.tsx
+│   │   │   └── completion/
+│   │   │       └── page.tsx
+│   │   ├── api/ (API Routes)
+│   │   │   ├── auth/
+│   │   │   │   ├── register/
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── [...nextauth]/
+│   │   │   │       └── route.ts
+│   │   │   ├── users/
+│   │   │   │   ├── profile/
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── academic-details/
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── recommendations/
+│   │   │   │       └── route.ts
+│   │   │   ├── mentors/
+│   │   │   │   ├── search/
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── [id]/
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── apply/
+│   │   │   │       └── route.ts
+│   │   │   ├── sessions/
+│   │   │   │   ├── book/
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── [id]/
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── pre-session/
+│   │   │   │       └── route.ts
+│   │   │   ├── payments/
+│   │   │   │   ├── create-intent/
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── confirm/
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── webhook/
+│   │   │   │       └── route.ts
+│   │   │   ├── uploads/
+│   │   │   │   ├── documents/
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── images/
+│   │   │   │       └── route.ts
+│   │   │   └── matching/
+│   │   │       ├── algorithm/
+│   │   │       │   └── route.ts
+│   │   │       └── recommendations/
+│   │   │           └── route.ts
+│   │   ├── globals.css (Global styles)
+│   │   ├── layout.tsx (Root layout)
+│   │   ├── page.tsx (Homepage)
+│   │   ├── loading.tsx (Global loading UI)
+│   │   ├── error.tsx (Global error UI)
+│   │   └── not-found.tsx (404 page)
+│   ├── components/
+│   │   ├── ui/ (Shadcn/ui components)
+│   │   │   ├── button.tsx
+│   │   │   ├── input.tsx
+│   │   │   ├── modal.tsx
+│   │   │   ├── form.tsx
+│   │   │   └── index.ts
+│   │   ├── forms/
+│   │   │   ├── DynamicAcademicForm.tsx
+│   │   │   ├── PreSessionForm.tsx
+│   │   │   ├── DocumentUpload.tsx
+│   │   │   └── GoalsSelector.tsx
+│   │   ├── layout/
+│   │   │   ├── Header.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   ├── Sidebar.tsx
+│   │   │   └── Navigation.tsx
+│   │   ├── onboarding/
+│   │   │   ├── AcademicLevelSelector.tsx
+│   │   │   ├── SchoolProfileForm.tsx
+│   │   │   ├── CollegeProfileForm.tsx
+│   │   │   ├── ProfessionalProfileForm.tsx
+│   │   │   └── ProgressStepper.tsx
+│   │   ├── mentors/
+│   │   │   ├── MentorCard.tsx
+│   │   │   ├── MentorProfile.tsx
+│   │   │   ├── AdvancedFilters.tsx
+│   │   │   ├── CompatibilityScore.tsx
+│   │   │   └── RecommendationsList.tsx
+│   │   ├── sessions/
+│   │   │   ├── BookingCalendar.tsx
+│   │   │   ├── VideoCall.tsx
+│   │   │   ├── SessionNotes.tsx
+│   │   │   ├── ProgressTracker.tsx
+│   │   │   └── FollowUpTasks.tsx
+│   │   └── dashboard/
+│   │       ├── AcademicProgress.tsx
+│   │       ├── CareerMilestones.tsx
+│   │       ├── UpcomingSessions.tsx
+│   │       └── QuickActions.tsx
+│   ├── lib/
+│   │   ├── prisma.ts (Database connection)
+│   │   ├── auth.ts (NextAuth configuration)
+│   │   ├── stripe.ts (Payment handling)
+│   │   ├── zoom.ts (Video call integration)
+│   │   ├── utils.ts (Utility functions)
+│   │   ├── validations.ts (Zod schemas)
+│   │   ├── constants.ts (App constants)
+│   │   ├── api-client.ts (API client)
+│   │   └── matching-algorithm.ts
+│   ├── hooks/
+│   │   ├── useAuth.ts
+│   │   ├── useMentors.ts
+│   │   ├── useSessions.ts
+│   │   ├── useLocalStorage.ts
+│   │   └── useOnboarding.ts
+│   ├── store/ (Zustand for state management)
+│   │   ├── authStore.ts
+│   │   ├── userStore.ts
+│   │   ├── mentorStore.ts
+│   │   └── onboardingStore.ts
+│   ├── types/
+│   │   ├── user.ts
+│   │   ├── mentor.ts
+│   │   ├── session.ts
+│   │   ├── academic.ts
+│   │   └── index.ts
+│   └── middleware.ts (Route protection)
+├── prisma/
+│   ├── schema.prisma
+│   ├── migrations/
+│   └── seed.ts
+├── public/
+│   ├── images/
+│   ├── icons/
+│   ├── documents/
+│   └── favicon.ico
+├── docs/
+│   ├── api.md
+│   ├── deployment.md
+│   └── database.md
+├── tests/
+│   ├── __mocks__/
+│   ├── components/
+│   ├── pages/
+│   └── utils/
+├── .env.local
+├── .env.example
+├── .gitignore
+├── next.config.js
+├── tailwind.config.ts
+├── tsconfig.json
+├── components.json (Shadcn/ui config)
+├── package.json
+└── README.md
+```
+
+**Key Next.js 14 Features Used:**
+
+### **1. App Router Benefits**
+- **File-based routing** with layouts and route groups
+- **Server Components by default** for better performance
+- **Streaming and Suspense** for faster page loads
+- **Built-in SEO optimization** with metadata API
+- **Parallel routes** for complex UI states
+
+### **2. Modern Architecture**
+- **Route groups** `(auth)`, `(dashboard)` for layout organization
+- **Colocation** of related files in same folder
+- **TypeScript-first** with `.tsx` extensions
+- **Middleware** for authentication and route protection
+- **Server Actions** for form submissions (optional)
+
+### **3. Performance Optimizations**
+- **Automatic code splitting** per route
+- **Image optimization** with next/image
+- **Font optimization** with next/font
+- **Bundle analyzer** ready configuration
+- **Static generation** where possible
+
+### **4. Developer Experience**
+- **Hot reload** and fast refresh
+- **Error boundaries** with error.tsx files
+- **Loading states** with loading.tsx files
+- **TypeScript integration** out of the box
+- **ESLint and Prettier** ready
+
+**Tech Stack Summary for Next.js 14:**
+```json
+{
+  "framework": "Next.js 14.2.x",
+  "language": "TypeScript",
+  "styling": "Tailwind CSS + Shadcn/ui",
+  "database": "PostgreSQL + Prisma",
+  "auth": "NextAuth.js v5",
+  "payments": "Stripe",
+  "video": "Zoom SDK",
+  "state": "Zustand",
+  "validation": "Zod",
+  "testing": "Jest + React Testing Library",
+  "deployment": "Vercel"
+}
+```

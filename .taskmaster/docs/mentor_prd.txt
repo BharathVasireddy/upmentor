@@ -1,0 +1,647 @@
+# Mentorship Platform PRD
+**Comprehensive Development Requirements Document**
+
+---
+
+## Overview
+
+### Problem Statement
+Students in India face significant challenges in accessing quality mentorship for academic and career guidance. The traditional mentorship ecosystem lacks structure, accessibility, and quality assurance, leaving millions of students without proper guidance during critical educational transitions.
+
+### Solution
+A comprehensive digital mentorship platform that connects students (school and college) with verified mentors through a sophisticated matching algorithm. The platform emphasizes language compatibility, academic specialization, and regional understanding to provide culturally relevant guidance.
+
+### Target Users
+- **Primary:** School students (grades 6-12) and college students seeking academic/career guidance
+- **Secondary:** Verified professionals and academics serving as mentors
+- **Tertiary:** Educational institutions and corporate partners
+
+### Value Proposition
+- **For Students:** Access to verified, specialized mentors with language and cultural compatibility
+- **For Mentors:** Structured platform to share expertise and earn supplemental income
+- **For Market:** Democratized access to quality mentorship across India's diverse educational landscape
+
+---
+
+## Core Features
+
+### 1. Enhanced User Management System
+**What it does:** Comprehensive user registration and profile management tailored for Indian educational context
+
+**Why it's important:** Foundation for personalized matching and quality control
+
+**How it works:**
+- Multi-step onboarding with academic level detection (school vs college)
+- Dynamic form generation based on user type and academic level
+- Language preference collection and cultural context mapping
+- Academic profiling without mandatory document uploads for faster onboarding
+- Role-based access control (Student, Mentor, Admin, Support)
+
+### 2. Intelligent Language-Based Matching Algorithm
+**What it does:** Sophisticated compatibility scoring system considering academic, linguistic, and geographic factors
+
+**Why it's important:** Ensures cultural relevance and communication effectiveness in mentorship relationships
+
+**How it works:**
+- Primary language compatibility scoring (Hindi, English, Telugu, etc.)
+- Academic level and field specialization matching
+- Geographic and cultural context consideration
+- Real-time compatibility score calculation
+- Precomputed mentor recommendations for performance
+
+### 3. Comprehensive Mentor Verification System
+**What it does:** Multi-stage verification process ensuring mentor quality and safety
+
+**Why it's important:** Builds trust and ensures platform credibility, especially for minor protection
+
+**How it works:**
+- Document verification (education, experience, identity)
+- Professional background checks through third-party services
+- Video interview process with admin team
+- Mandatory trial session with platform assessment
+- Ongoing performance monitoring and quality control
+- Quarterly reviews and continuous improvement feedback
+
+### 4. Streamlined Session Management
+**What it does:** End-to-end session lifecycle management from booking to follow-up
+
+**Why it's important:** Simplifies the mentorship experience and ensures session quality
+
+**How it works:**
+- Pre-session questionnaire for context collection
+- Zoom SDK integration for reliable video calls
+- Multi-language session support
+- Session recording with privacy controls
+- Post-session notes and progress tracking
+- Follow-up task management and milestone tracking
+
+### 5. Advanced Discovery and Search System
+**What it does:** Sophisticated filtering and recommendation engine for mentor discovery
+
+**Why it's important:** Helps students find the most suitable mentors efficiently
+
+**How it works:**
+- Language-based filtering and recommendations
+- Academic specialization and industry focus filters
+- Geographic and timezone compatibility
+- Experience level and rating-based sorting
+- AI-powered personalized recommendations
+- Real-time availability checking
+
+### 6. Robust Payment and Financial System
+**What it does:** Secure, multi-method payment processing with regional support
+
+**Why it's important:** Enables monetization while supporting Indian payment preferences
+
+**How it works:**
+- Multiple payment methods (UPI, cards, net banking, wallets)
+- Escrow system for payment security
+- Automated commission splitting (70% mentor, 30% platform)
+- Refund and dispute resolution system
+- Tax compliance and invoice generation
+- Mentor payout management with various disbursement options
+
+---
+
+## User Experience
+
+### User Personas
+
+**Primary Persona: Priya (College Student)**
+- 19-year-old engineering student from Hyderabad
+- Preparing for campus placements, needs career guidance
+- Prefers Telugu or English communication
+- Looking for industry professionals in tech sector
+- Budget-conscious, values quality mentorship
+
+**Secondary Persona: Rahul (School Student)**
+- 16-year-old class 11 student from Mumbai
+- Confused about stream selection and career options
+- Hindi/English speaker, needs academic guidance
+- Parents involved in decision-making process
+- Requires exam preparation support
+
+**Tertiary Persona: Dr. Sharma (Mentor)**
+- 32-year-old software architect from Bangalore
+- 8 years industry experience, wants to give back
+- Comfortable with English and Hindi
+- Available for 5-6 hours per week
+- Seeks structured platform for mentoring
+
+### Key User Flows
+
+**Student Onboarding Flow:**
+1. **Registration** → Email/phone verification
+2. **Academic Level Selection** → School or College student
+3. **Profile Creation** → Dynamic form based on academic level
+4. **Language Preferences** → Primary and additional languages
+5. **Goals Assessment** → Career interests and challenges
+6. **Mentor Recommendations** → Algorithm-generated suggestions
+7. **Platform Orientation** → Feature walkthrough and first booking
+
+**Session Booking Flow:**
+1. **Mentor Discovery** → Search/browse/recommendations
+2. **Profile Review** → Mentor background and compatibility
+3. **Pre-session Form** → Session purpose and specific questions
+4. **Scheduling** → Calendar integration and timezone handling
+5. **Payment** → Secure payment processing
+6. **Confirmation** → Email/SMS notifications to both parties
+7. **Session Execution** → Video call with recording capabilities
+
+**Mentor Verification Flow:**
+1. **Application Submission** → Basic information and documents
+2. **Document Review** → Admin verification (24-48 hours)
+3. **Background Check** → Third-party verification (3-5 days)
+4. **Interview Scheduling** → Video interview with platform team
+5. **Trial Session** → Supervised session with feedback
+6. **Final Decision** → Approval/rejection with detailed feedback
+7. **Platform Onboarding** → Training and profile optimization
+
+### UI/UX Considerations
+
+**Design Principles:**
+- **Accessibility First:** WCAG 2.1 compliance with screen reader support
+- **Mobile Responsive:** Touch-optimized design for mobile-first users
+- **Cultural Sensitivity:** Regional design elements and language support
+- **Performance Focused:** Sub-500ms load times with optimistic updates
+- **Trust Building:** Clear mentor credentials and verification badges
+
+**Interface Elements:**
+- **Language Switcher:** Prominent placement for easy language change
+- **Compatibility Scores:** Visual indicators for mentor-student matching
+- **Progress Tracking:** Dashboard showing academic/career milestones
+- **Safety Features:** Easy reporting mechanisms and emergency contacts
+- **Personalization:** Customized recommendations and content
+
+---
+
+## Technical Architecture
+
+### System Components
+
+**Frontend Architecture:**
+```typescript
+// Next.js 14 with App Router
+├── app/ (Route structure)
+│   ├── (auth)/ (Authentication routes)
+│   ├── (dashboard)/ (Protected user areas)
+│   ├── mentors/ (Public mentor discovery)
+│   ├── sessions/ (Session management)
+│   ├── onboarding/ (User onboarding flows)
+│   └── api/ (API endpoints)
+├── components/ (Reusable UI components)
+├── lib/ (Utilities and configurations)
+└── types/ (TypeScript definitions)
+```
+
+**Backend Services:**
+- **Authentication:** NextAuth.js with multiple providers
+- **Database:** PostgreSQL with Prisma ORM
+- **Video Calls:** Zoom SDK integration
+- **Payments:** Stripe with regional payment methods
+- **File Storage:** AWS S3 with CDN
+- **Notifications:** Email (SendGrid) and SMS (Twilio)
+- **Analytics:** Custom tracking with privacy compliance
+
+### Data Models
+
+**Core Entities:**
+```sql
+-- Enhanced user model for students only
+users (
+  id, email, phone, name, password_hash,
+  profile_image, date_of_birth, gender,
+  city, state, country, timezone,
+  current_grade, academic_level, institution_name,
+  field_of_study, graduation_year, gpa_score,
+  interests[], career_goals[], preferred_industries[],
+  primary_language, languages_spoken[],
+  created_at, updated_at, is_verified
+)
+
+-- Academic details with dynamic fields
+academic_details (
+  id, user_id, academic_level,
+  -- School students
+  school_name, board, class_grade, stream, subjects[],
+  -- College students
+  university_name, degree_type, major, semester, cgpa,
+  -- Common fields
+  achievements[], goals[], challenges[]
+)
+
+-- Comprehensive mentor profiles
+mentors (
+  id, user_id, title, company, experience_years,
+  expertise_areas[], academic_specializations[],
+  hourly_rate, bio, verification_status,
+  primary_language, languages_spoken[],
+  total_sessions, avg_rating, response_time,
+  performance_score, background_check_status
+)
+
+-- Session management with language support
+sessions (
+  id, user_id, mentor_id, scheduled_at, duration,
+  session_type, session_language, user_questions[],
+  mentor_notes, recording_url, satisfaction_rating,
+  follow_up_tasks[], status, payment_id
+)
+```
+
+### APIs and Integrations
+
+**Core API Structure:**
+```
+/api/
+├── auth/ (Registration, login, verification)
+├── users/ (Profile management, academic details)
+├── mentors/ (Search, profiles, verification)
+├── sessions/ (Booking, management, notes)
+├── matching/ (Algorithm, recommendations)
+├── payments/ (Processing, refunds, disputes)
+├── admin/ (Platform management, analytics)
+└── uploads/ (File handling, document storage)
+```
+
+**External Integrations:**
+- **Zoom API:** Meeting creation and management
+- **Stripe API:** Payment processing and webhooks
+- **SendGrid API:** Transactional email delivery
+- **Twilio API:** SMS notifications and verification
+- **AWS S3 API:** File storage and retrieval
+- **Google Calendar API:** Schedule integration
+
+### Infrastructure Requirements
+
+**Production Environment:**
+- **Hosting:** Vercel for Next.js deployment
+- **Database:** PostgreSQL on AWS RDS with read replicas
+- **CDN:** CloudFront for global asset delivery
+- **Monitoring:** Vercel Analytics + custom error tracking
+- **Security:** WAF protection and DDoS mitigation
+- **Backup:** Automated daily backups with 90-day retention
+
+**Performance Targets:**
+- **API Response Time:** <300ms for 95th percentile
+- **Page Load Time:** <1.5s first contentful paint
+- **Database Queries:** <100ms average execution time
+- **Uptime:** 99.9% availability SLA
+- **Video Call Quality:** <150ms latency for Indian users
+
+---
+
+## Development Roadmap
+
+### Phase 1: Foundation & Core User Management (Weeks 1-6)
+**MVP Requirements:**
+- User authentication and authorization system
+- Multi-step student onboarding with academic profiling
+- Basic mentor registration and profile creation
+- Simple admin panel for user management
+- Database schema implementation with core tables
+- Basic frontend with authentication flows
+
+**Deliverables:**
+- Functional user registration for students (school/college)
+- Language preference selection during onboarding
+- Basic mentor application process
+- Admin dashboard for user verification
+- Responsive UI framework with Tailwind CSS + Shadcn/ui
+
+**Success Criteria:**
+- Students can complete registration and academic profiling
+- Mentors can submit applications with basic verification
+- Admin can approve/reject mentor applications
+- All user roles can authenticate and access appropriate dashboards
+
+### Phase 2: Enhanced Matching & Discovery (Weeks 7-12)
+**Core Features:**
+- Sophisticated matching algorithm with language compatibility
+- Advanced mentor search and filtering system
+- Personalized recommendation engine
+- Mentor profile pages with compatibility scoring
+- Basic booking system without session execution
+
+**Deliverables:**
+- Language-aware matching algorithm implementation
+- Search interface with multiple filter options
+- Mentor discovery page with personalized recommendations
+- Compatibility scoring visualization
+- Session booking flow (without video integration)
+
+**Success Criteria:**
+- Students can discover relevant mentors based on language and academic needs
+- Matching algorithm provides accurate compatibility scores
+- Search and filtering perform within 300ms response time
+- Booking system captures pre-session information effectively
+
+### Phase 3: Session Management & Video Integration (Weeks 13-18)
+**Core Features:**
+- Zoom SDK integration for video sessions
+- Pre-session questionnaire system
+- Session scheduling with calendar integration
+- Basic payment processing with Stripe
+- Session history and progress tracking
+
+**Deliverables:**
+- Fully functional video calling capability
+- Payment integration with Indian payment methods
+- Session management dashboard for students and mentors
+- Automated email/SMS notifications
+- Session recording and playback functionality
+
+**Success Criteria:**
+- Students and mentors can conduct video sessions reliably
+- Payment processing works for major Indian payment methods
+- Session scheduling handles timezone differences correctly
+- Video quality meets minimum standards for educational content
+
+### Phase 4: Quality Assurance & Advanced Features (Weeks 19-24)
+**Enhanced Features:**
+- Comprehensive mentor verification system
+- Advanced admin panel with analytics
+- Rating and review system
+- Refund and dispute resolution
+- Performance optimization and monitoring
+
+**Deliverables:**
+- Multi-stage mentor verification workflow
+- Analytics dashboard for platform performance
+- Review system with moderation capabilities
+- Automated refund processing
+- Performance monitoring and optimization
+
+**Success Criteria:**
+- Mentor verification process maintains quality standards
+- Platform performance meets target response times
+- Review system provides meaningful feedback
+- Financial transactions are secure and reliable
+
+### Phase 5: Scale & Enhancement (Weeks 25-30)
+**Scaling Features:**
+- Mobile app development
+- Advanced analytics and insights
+- Integration with educational institutions
+- Automated customer support
+- Regional expansion capabilities
+
+**Deliverables:**
+- React Native mobile applications
+- Business intelligence dashboard
+- Partnership integration APIs
+- Chatbot for common support queries
+- Multi-region deployment capability
+
+**Success Criteria:**
+- Mobile apps provide feature parity with web platform
+- Analytics provide actionable business insights
+- Platform can handle 10,000+ concurrent users
+- Customer support response time under 2 hours
+
+---
+
+## Logical Dependency Chain
+
+### Foundation Layer (Must Build First)
+1. **Database Schema & Models** → Core data structure for all features
+2. **Authentication System** → Required for all user interactions
+3. **Basic User Registration** → Foundation for onboarding flows
+4. **Role-Based Access Control** → Security foundation for different user types
+
+### Core Platform Layer (Build Upon Foundation)
+5. **Student Onboarding Flow** → Creates user base for matching
+6. **Mentor Application Process** → Creates mentor pool for platform
+7. **Basic Admin Panel** → Required for mentor verification and platform management
+8. **Profile Management** → Essential for matching algorithm inputs
+
+### Matching & Discovery Layer (Requires User Base)
+9. **Matching Algorithm** → Core value proposition requiring user and mentor profiles
+10. **Search & Filtering System** → Depends on mentor profiles and matching logic
+11. **Recommendation Engine** → Builds upon matching algorithm and user behavior
+12. **Mentor Discovery Interface** → Frontend for matching and search functionality
+
+### Transaction Layer (Requires Discovery)
+13. **Session Booking System** → Requires mentor discovery and user profiles
+14. **Payment Integration** → Essential for session monetization
+15. **Pre-Session Data Collection** → Improves session quality and outcomes
+
+### Session Execution Layer (Requires Booking)
+16. **Video Call Integration** → Core service delivery mechanism
+17. **Session Management** → Lifecycle management for booked sessions
+18. **Recording & Notes System** → Value-added features for session quality
+
+### Quality & Growth Layer (Builds Upon Core)
+19. **Review & Rating System** → Requires completed sessions for feedback
+20. **Advanced Analytics** → Needs user interaction data for insights
+21. **Mentor Verification Enhancement** → Builds upon basic verification system
+22. **Performance Optimization** → Requires baseline functionality to optimize
+
+### Critical Path for Quick Usability
+**Week 1-2:** Database + Authentication → Basic login functionality
+**Week 3-4:** User registration + Basic profiles → Users can create accounts
+**Week 5-6:** Mentor profiles + Basic discovery → Students can browse mentors
+**Week 7-8:** Simple booking system → End-to-end booking flow (without video)
+**Week 9-10:** Payment integration → Monetization capability
+**Week 11-12:** Video integration → Complete session experience
+
+### Atomic Feature Scoping
+Each feature is designed to be:
+- **Self-Contained:** Can be developed and tested independently
+- **Incrementally Valuable:** Adds tangible value even without dependent features
+- **Extensible:** Can be enhanced in future iterations without architectural changes
+- **Testable:** Clear success criteria and user acceptance tests
+
+---
+
+## Risks and Mitigations
+
+### Technical Challenges
+
+**Risk: Video Call Reliability**
+- **Impact:** Poor session quality could damage platform reputation
+- **Mitigation:** Use proven Zoom SDK instead of custom WebRTC implementation
+- **Monitoring:** Real-time call quality metrics and automatic fallback options
+- **Backup Plan:** Integration with multiple video providers for redundancy
+
+**Risk: Matching Algorithm Accuracy**
+- **Impact:** Poor matches could lead to unsatisfactory sessions
+- **Mitigation:** Start with simple rule-based matching, iterate based on feedback
+- **Data Strategy:** Collect detailed feedback to improve algorithm over time
+- **A/B Testing:** Test different matching approaches with user segments
+
+**Risk: Database Performance at Scale**
+- **Impact:** Slow response times as user base grows
+- **Mitigation:** Implement proper indexing and query optimization from start
+- **Monitoring:** Database performance metrics and query analysis
+- **Scaling Plan:** Read replicas and connection pooling for high availability
+
+### Product and Market Risks
+
+**Risk: Mentor Quality and Retention**
+- **Impact:** Insufficient or low-quality mentors reduces platform value
+- **Mitigation:** Comprehensive verification process and ongoing quality monitoring
+- **Incentives:** Competitive revenue sharing and recognition programs
+- **Community Building:** Mentor training and peer support systems
+
+**Risk: Student Acquisition and Engagement**
+- **Impact:** Low student adoption limits platform growth
+- **Mitigation:** Focus on specific use cases (exam prep, career guidance) initially
+- **Partnerships:** Collaborate with educational institutions for user acquisition
+- **Value Demonstration:** Free trial sessions and clear success metrics
+
+**Risk: Payment and Financial Compliance**
+- **Impact:** Regulatory issues could halt operations
+- **Mitigation:** Work with established payment providers (Stripe) with Indian compliance
+- **Legal Review:** Regular compliance audits and legal consultation
+- **Documentation:** Maintain detailed financial records and tax compliance
+
+### Operational Risks
+
+**Risk: Child Safety and Protection**
+- **Impact:** Safety incidents could cause severe reputational damage
+- **Mitigation:** Enhanced verification for mentors working with minors
+- **Monitoring:** All sessions with minors are recorded and monitored
+- **Policies:** Clear guidelines and immediate escalation procedures
+
+**Risk: Customer Support Scale**
+- **Impact:** Poor support experience as user base grows
+- **Mitigation:** Implement tiered support system with automated first response
+- **Knowledge Base:** Comprehensive self-service options for common issues
+- **Escalation:** Clear escalation paths for complex issues
+
+### MVP Strategy and Build-Upon Approach
+
+**Minimum Viable Product Focus:**
+- **Core Value:** Students can find and book sessions with verified mentors
+- **Essential Features Only:** Registration, discovery, booking, video calls, payments
+- **Quality Over Quantity:** Focus on excellent execution of core features
+- **User Feedback Loop:** Rapid iteration based on early user feedback
+
+**Build-Upon Strategy:**
+- **Modular Architecture:** Each feature designed for easy enhancement
+- **Data Collection:** Gather user behavior data from day one for future improvements
+- **Scalable Foundation:** Infrastructure choices that support 10x growth
+- **Feature Flags:** Ability to enable/disable features for different user segments
+
+**Resource Optimization:**
+- **Third-Party Integration:** Use proven solutions (Zoom, Stripe) instead of building from scratch
+- **Open Source Leverage:** Utilize mature libraries and frameworks (Next.js, Prisma)
+- **Cloud Services:** Managed services to reduce operational overhead
+- **Agile Development:** Short sprints with continuous deployment and testing
+
+---
+
+## Appendix
+
+### Research Findings
+
+**Market Analysis:**
+- **Addressable Market:** 300M+ students in India across school and college levels
+- **Pain Points:** 73% of students report lack of career guidance, 68% struggle with academic decisions
+- **Language Preferences:** 67% prefer local language support, 45% are bilingual
+- **Payment Behavior:** 78% prefer UPI/digital wallets, 23% use credit/debit cards
+
+**Competitive Landscape:**
+- **Direct Competitors:** Limited platforms with comprehensive mentor verification
+- **Indirect Competitors:** Coaching institutes, career counseling services
+- **Differentiation:** Language-aware matching and academic specialization focus
+- **Market Gap:** Structured, verified mentorship with regional understanding
+
+**User Research Insights:**
+- **Student Needs:** Clear career paths, exam preparation, skill development guidance
+- **Mentor Motivations:** Giving back to community, supplemental income, professional recognition
+- **Platform Requirements:** Easy scheduling, reliable video quality, secure payments
+- **Success Metrics:** Session completion rate, repeat bookings, mentor ratings
+
+### Technical Specifications
+
+**Database Schema Detail:**
+```sql
+-- Performance-optimized indexes
+CREATE INDEX CONCURRENTLY idx_users_academic_language ON users(academic_level, primary_language);
+CREATE INDEX CONCURRENTLY idx_mentors_active_verified ON mentors(is_active, verification_status) WHERE is_active = true;
+CREATE INDEX CONCURRENTLY idx_sessions_upcoming ON sessions(scheduled_at) WHERE scheduled_at > NOW();
+CREATE INDEX CONCURRENTLY idx_mentors_compatibility ON mentors USING GIN(languages_spoken, academic_specializations);
+
+-- Audit trail for compliance
+CREATE TABLE audit_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id),
+  action_type VARCHAR(50) NOT NULL,
+  resource_type VARCHAR(50) NOT NULL,
+  resource_id UUID,
+  old_values JSONB,
+  new_values JSONB,
+  ip_address INET,
+  user_agent TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+**API Security Specifications:**
+```typescript
+// Rate limiting configuration
+const rateLimitConfig = {
+  '/api/auth/*': { requests: 5, window: '15m' },
+  '/api/sessions/book': { requests: 3, window: '1m' },
+  '/api/mentors/search': { requests: 20, window: '1m' },
+  '/api/payments/*': { requests: 10, window: '5m' }
+};
+
+// Input validation schemas
+const sessionBookingSchema = z.object({
+  mentor_id: z.string().uuid(),
+  scheduled_at: z.date().min(new Date()),
+  duration: z.enum(['30', '60', '90']),
+  session_language: z.string().min(2),
+  user_questions: z.array(z.string()).max(5),
+  session_type: z.enum(['academic', 'career', 'exam_prep'])
+});
+```
+
+**Performance Monitoring:**
+```typescript
+// API response time tracking
+const performanceMiddleware = (req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    if (duration > 500) {
+      logger.warn(`Slow API: ${req.method} ${req.path} took ${duration}ms`);
+    }
+    analytics.track('api_performance', {
+      path: req.path,
+      method: req.method,
+      duration,
+      status: res.statusCode
+    });
+  });
+  next();
+};
+```
+
+### Compliance and Security Requirements
+
+**Data Protection (Indian Context):**
+- **Data Localization:** All Indian user data stored within India
+- **Consent Management:** Explicit consent for data processing and sharing
+- **Minor Protection:** Enhanced safeguards for users under 18
+- **Right to Deletion:** Complete data removal within 30 days
+- **Audit Trail:** Comprehensive logging for compliance verification
+
+**Security Standards:**
+- **Authentication:** Multi-factor authentication for sensitive operations
+- **Encryption:** AES-256 for data at rest, TLS 1.3 for data in transit
+- **Access Control:** Role-based permissions with principle of least privilege
+- **Session Management:** Secure session handling with automatic timeout
+- **Payment Security:** PCI DSS compliance through Stripe integration
+
+**Quality Assurance Framework:**
+- **Mentor Verification:** Multi-stage verification with background checks
+- **Session Monitoring:** Quality reviews and performance tracking
+- **User Safety:** Reporting mechanisms and immediate escalation procedures
+- **Content Moderation:** AI-powered inappropriate content detection
+- **Dispute Resolution:** Fair and transparent conflict resolution process
+
+This comprehensive PRD provides the foundation for building a scalable, secure, and culturally-aware mentorship platform that addresses the specific needs of the Indian education market while maintaining global technical standards.

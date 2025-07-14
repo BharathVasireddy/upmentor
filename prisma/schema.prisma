@@ -1,0 +1,359 @@
+// Prisma schema for UpMentor platform
+// Based on PRD reference docs
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+}
+
+enum RoleType {
+  STUDENT
+  MENTOR
+  ADMIN
+  SUPPORT
+}
+
+enum VerificationStatus {
+  PENDING
+  DOCUMENTS_UNDER_REVIEW
+  BACKGROUND_CHECK_IN_PROGRESS
+  INTERVIEW_SCHEDULED
+  TRIAL_SESSION_REQUIRED
+  APPROVED
+  REJECTED
+  SUSPENDED
+  REAPPLICATION_REQUIRED
+}
+
+model User {
+  id                 String   @id @default(uuid())
+  email              String   @unique
+  phone              String?
+  name               String
+  passwordHash       String
+  profileImage       String?
+  dateOfBirth        DateTime?
+  gender             String?
+  city               String?
+  state              String?
+  country            String?
+  timezone           String?
+  currentGrade       String?
+  academicLevel      String?
+  institutionName    String?
+  fieldOfStudy       String?
+  graduationYear     Int?
+  gpaScore           Float?
+  interests          String[]
+  careerGoals        String[]
+  preferredIndustries String[]
+  primaryLanguage    String
+  languagesSpoken    String[]
+  linkedinUrl        String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  isVerified         Boolean  @default(false)
+  onboardingCompleted Boolean @default(false)
+  lastActive         DateTime?
+  accountStatus      AccountStatus @default(ACTIVE)
+  parentEmail        String?
+  academicDetails    AcademicDetails[]
+  careerPreferences  CareerPreferences[]
+  userRoles          UserRole[]
+  sessions           Session[]
+  userProgress       UserProgress[]
+  supportTickets     SupportTicket[]
+  auditLogs          AuditLog[]
+  mentor             Mentor? // One-to-one relation to Mentor
+}
+
+model AcademicDetails {
+  id             String   @id @default(uuid())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         String
+  academicLevel  String
+  schoolName     String?
+  board          String?
+  classGrade     String?
+  stream         String?
+  subjects       String[]
+  extracurricular String[]
+  universityName String?
+  degreeType     String?
+  major          String?
+  minor          String?
+  semester       Int?
+  cgpa           Float?
+  projects       String[]
+  internships    String[]
+  achievements   String[]
+  goals          String[]
+  challenges     String[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model CareerPreferences {
+  id                String   @id @default(uuid())
+  user              User     @relation(fields: [userId], references: [id])
+  userId            String
+  preferredRoles    String[]
+  targetCompanies   String[]
+  desiredLocations  String[]
+  workPreferences   String?
+  careerTimeline    String?
+  specificConcerns  String[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Mentor {
+  id                    String   @id @default(uuid())
+  user                  User     @relation(fields: [userId], references: [id])
+  userId                String   @unique
+  title                 String?
+  university            String?
+  company               String?
+  experienceYears       Int?
+  expertiseAreas        String[]
+  academicSpecializations String[]
+  industryFocus         String[]
+  studentLevelsServed   String[]
+  hourlyRate            Float?
+  bio                   String?
+  linkedinUrl           String?
+  verificationStatus    VerificationStatus @default(PENDING)
+  verificationDocs      String[]
+  verificationNotes     String?
+  verifiedBy            String?
+  verifiedAt            DateTime?
+  rejectionReason       String?
+  totalSessions         Int      @default(0)
+  avgRating             Float    @default(0)
+  responseTime          Int?
+  primaryLanguage       String
+  languagesSpoken       String[]
+  timezone              String?
+  isActive              Boolean  @default(true)
+  mentorType            String?
+  performanceScore      Float?
+  payoutDetails         String?
+  taxInformation        String?
+  backgroundCheckStatus String?
+  mentorVerification    MentorVerification[]
+  mentorCompatibility   MentorCompatibility[]
+  sessions              Session[]
+  mentorPayouts         MentorPayout[]
+  qualityReviews        QualityReview[]
+}
+
+model MentorVerification {
+  id                String   @id @default(uuid())
+  mentor            Mentor   @relation(fields: [mentorId], references: [id])
+  mentorId          String
+  verificationType  String
+  documentType      String
+  documentUrl       String
+  verificationStatus VerificationStatus @default(PENDING)
+  submittedAt       DateTime @default(now())
+  reviewedBy        String?
+  reviewedAt        DateTime?
+  rejectionReason   String?
+  expiryDate        DateTime?
+  autoReverifyDate  DateTime?
+}
+
+model UserRole {
+  id           String   @id @default(uuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+  roleType     RoleType
+  permissions  String[]
+  assignedBy   String?
+  assignedAt   DateTime?
+  isActive     Boolean  @default(true)
+}
+
+model AdminUser {
+  id               String   @id @default(uuid())
+  userId           String
+  adminType        String?
+  department       String?
+  permissions      String[]
+  managedRegions   String[]
+  managedLanguages String[]
+  createdAt        DateTime @default(now())
+}
+
+model Language {
+  id                   String   @id @default(uuid())
+  languageCode         String   @unique
+  languageName         String
+  isActive             Boolean  @default(true)
+  region               String?
+  nativeSpeakersCount  Int?
+}
+
+model MentorCompatibility {
+  id              String   @id @default(uuid())
+  mentor          Mentor   @relation(fields: [mentorId], references: [id])
+  mentorId        String
+  studentSegment  String
+  baseScore       Float?
+  languageScore   Float?
+  academicScore   Float?
+  locationScore   Float?
+  lastComputed    DateTime?
+  isActive        Boolean  @default(true)
+}
+
+model Session {
+  id                    String   @id @default(uuid())
+  user                  User     @relation(fields: [userId], references: [id])
+  userId                String
+  mentor                Mentor   @relation(fields: [mentorId], references: [id])
+  mentorId              String
+  scheduledAt           DateTime
+  duration              Int
+  amount                Float
+  status                String
+  paymentId             String?
+  sessionType           String?
+  sessionLanguage       String?
+  userQuestions         String[]
+  mentorNotes           String?
+  videoRoomId           String?
+  recordingUrl          String?
+  recordingAccessExpires DateTime?
+  followUpTasks         String[]
+  satisfactionRating    Float?
+  mentorRating          Float?
+  createdAt             DateTime @default(now())
+  cancellationReason    String?
+  rescheduledFrom       String?
+  conflictResolution    String?
+  sessionConflicts      SessionConflict[]
+  payments              Payment[]
+}
+
+model SessionConflict {
+  id                  String   @id @default(uuid())
+  session             Session  @relation(fields: [sessionId], references: [id])
+  sessionId           String
+  conflictType        String
+  reportedBy          String
+  reportedAt          DateTime @default(now())
+  resolutionType      String?
+  resolvedBy          String?
+  resolvedAt          DateTime?
+  compensationAmount  Float?
+  notes               String?
+}
+
+model Payment {
+  id                String   @id @default(uuid())
+  session           Session  @relation(fields: [sessionId], references: [id])
+  sessionId         String
+  userId            String
+  mentorId          String
+  amount            Float
+  platformFee       Float?
+  mentorEarnings    Float?
+  paymentMethod     String?
+  status            String
+  paymentGatewayId  String?
+  gatewayResponse   String?
+  refundAmount      Float?
+  refundReason      String?
+  refundedAt        DateTime?
+  payoutId          String?
+  payoutStatus      String?
+  createdAt         DateTime @default(now())
+  mentorPayout      MentorPayout?
+}
+
+model MentorPayout {
+  id                  String   @id @default(uuid())
+  mentor              Mentor   @relation(fields: [mentorId], references: [id])
+  mentorId            String
+  payoutPeriodStart   DateTime
+  payoutPeriodEnd     DateTime
+  totalEarnings       Float
+  platformFee         Float
+  taxDeduction        Float
+  netAmount           Float
+  payoutMethod        String?
+  payoutReference     String?
+  status              String
+  processedAt         DateTime?
+  createdAt           DateTime @default(now())
+  payment             Payment? @relation(fields: [paymentId], references: [id])
+  paymentId           String? @unique
+}
+
+model UserProgress {
+  id             String   @id @default(uuid())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         String
+  milestoneType  String
+  milestoneData  String
+  achievedAt     DateTime?
+  mentorId       String?
+  sessionId      String?
+  progressNotes  String?
+  nextSteps      String[]
+}
+
+model QualityReview {
+  id               String   @id @default(uuid())
+  mentor           Mentor   @relation(fields: [mentorId], references: [id])
+  mentorId         String
+  reviewType       String
+  reviewerId       String
+  reviewDate       DateTime @default(now())
+  rating           Float
+  feedback         String?
+  actionTaken      String?
+  followUpRequired Boolean  @default(false)
+  createdAt        DateTime @default(now())
+}
+
+model SupportTicket {
+  id                String   @id @default(uuid())
+  user              User     @relation(fields: [userId], references: [id])
+  userId            String
+  ticketType        String
+  priority          String
+  status            String
+  subject           String
+  description       String
+  assignedTo        String?
+  createdAt         DateTime @default(now())
+  resolvedAt        DateTime?
+  resolutionNotes   String?
+  satisfactionRating Float?
+}
+
+model AuditLog {
+  id            String   @id @default(uuid())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  actionType    String
+  resourceType  String
+  resourceId    String
+  oldValues     String?
+  newValues     String?
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+}
