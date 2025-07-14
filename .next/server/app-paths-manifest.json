@@ -1,6 +1,24 @@
 {
-  "/page": "app/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/(auth)/register/page": "app/(auth)/register/page.js",
-  "/mentors/page": "app/mentors/page.js"
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/uploads/profile-images/route": "app/api/uploads/profile-images/route.js",
+  "/api/users/academic-details/route": "app/api/users/academic-details/route.js",
+  "/api/users/career-goals/route": "app/api/users/career-goals/route.js",
+  "/api/users/complete-onboarding/route": "app/api/users/complete-onboarding/route.js",
+  "/api/users/goals-assessment/route": "app/api/users/goals-assessment/route.js",
+  "/api/users/interests/route": "app/api/users/interests/route.js",
+  "/api/users/language-preferences/route": "app/api/users/language-preferences/route.js",
+  "/api/users/profile/route": "app/api/users/profile/route.js",
+  "/api/users/role/route": "app/api/users/role/route.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/mentors/page": "app/mentors/page.js",
+  "/onboarding/academic-level/page": "app/onboarding/academic-level/page.js",
+  "/onboarding/college-profile/page": "app/onboarding/college-profile/page.js",
+  "/onboarding/completion/page": "app/onboarding/completion/page.js",
+  "/onboarding/goals-assessment/page": "app/onboarding/goals-assessment/page.js",
+  "/onboarding/language-preferences/page": "app/onboarding/language-preferences/page.js",
+  "/onboarding/school-profile/page": "app/onboarding/school-profile/page.js",
+  "/page": "app/page.js",
+  "/api/auth/register/route": "app/api/auth/register/route.js"
 }

@@ -18,28 +18,25 @@ export async function POST(request: NextRequest) {
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
-        onboarding_completed: true,
-        profile_image: validatedData.profile_image || null,
-        updated_at: new Date(),
+        onboardingCompleted: true,
+        profileImage: validatedData.profile_image || null,
+        updatedAt: new Date(),
       },
     });
 
     // Create user role for student
-    await prisma.userRoles.upsert({
-      where: { user_id: userId },
+    await prisma.userRole.upsert({
+      where: { userId: userId },
       update: {
-        role_type: 'student',
-        is_active: true,
-        updated_at: new Date(),
+        roleType: 'STUDENT',
+        isActive: true,
       },
       create: {
-        user_id: userId,
-        role_type: 'student',
+        userId: userId,
+        roleType: 'STUDENT',
         permissions: ['view_profile', 'book_sessions', 'view_mentors'],
-        is_active: true,
-        assigned_at: new Date(),
-        created_at: new Date(),
-        updated_at: new Date(),
+        isActive: true,
+        assignedAt: new Date(),
       },
     });
 
@@ -48,8 +45,8 @@ export async function POST(request: NextRequest) {
       message: 'Onboarding completed successfully',
       user: {
         id: updatedUser.id,
-        onboarding_completed: updatedUser.onboarding_completed,
-        profile_image: updatedUser.profile_image,
+        onboardingCompleted: updatedUser.onboardingCompleted,
+        profileImage: updatedUser.profileImage,
       },
     });
 
@@ -58,7 +55,7 @@ export async function POST(request: NextRequest) {
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation error', details: error.errors },
+        { error: 'Validation error', details: error.issues },
         { status: 400 }
       );
     }

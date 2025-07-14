@@ -21,26 +21,26 @@ export async function POST(request: NextRequest) {
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
-        career_goals: validatedData.career_goals,
+        careerGoals: validatedData.career_goals,
         interests: validatedData.interests,
-        updated_at: new Date(),
+        updatedAt: new Date(),
       },
     });
 
     // Create career preferences record
     await prisma.careerPreferences.upsert({
-      where: { user_id: userId },
+      where: { userId: userId },
       update: {
-        preferred_roles: validatedData.career_goals,
-        specific_concerns: validatedData.challenges || [],
-        updated_at: new Date(),
+        preferredRoles: validatedData.career_goals,
+        specificConcerns: validatedData.challenges || [],
+        updatedAt: new Date(),
       },
       create: {
-        user_id: userId,
-        preferred_roles: validatedData.career_goals,
-        specific_concerns: validatedData.challenges || [],
-        created_at: new Date(),
-        updated_at: new Date(),
+        userId: userId,
+        preferredRoles: validatedData.career_goals,
+        specificConcerns: validatedData.challenges || [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     });
 
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       message: 'Goals assessment saved successfully',
       user: {
         id: updatedUser.id,
-        career_goals: updatedUser.career_goals,
+        careerGoals: updatedUser.careerGoals,
         interests: updatedUser.interests,
       },
     });
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation error', details: error.errors },
+        { error: 'Validation error', details: error.issues },
         { status: 400 }
       );
     }
