@@ -24,6 +24,10 @@ node_modules/
 # OS specific
 .DS_Store
 
+# Next.js build output
+.next/
+out/
+
 # Task files
 # tasks.json
 # tasks/ 
