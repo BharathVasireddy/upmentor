@@ -74,7 +74,7 @@ export default function Footer({ variant = 'default' }: FooterProps) {
               </li>
               <li>
                 <Link
-                  href="/mentor-signup"
+                  href="/become-mentor"
                   className="transition-colors hover:text-neutral-900"
                 >
                   Become a Mentor

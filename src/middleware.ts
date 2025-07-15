@@ -11,6 +11,16 @@ const publicRoutes = [
   '/reset-password',
   '/verify-email',
   '/resend-verification',
+  '/mentors', // Header navigation
+  '/how-it-works', // Header navigation
+  '/success-stories', // Header navigation
+  '/help', // Footer link
+  '/contact', // Footer link
+  '/privacy', // Footer link
+  '/terms', // Footer link
+  '/pricing', // Footer link
+  '/become-mentor', // Landing page link & Footer link (mentor registration)
+  '/mentor-info', // Landing page link
   '/api/auth',
   '/api/test-email',
   '/api/users/user-type',
