@@ -33,14 +33,14 @@ export async function POST(request: NextRequest) {
     await prisma.careerPreferences.upsert({
       where: { userId: userId },
       update: {
-        preferredRoles: validatedData.career_goals,
-        specificConcerns: validatedData.challenges || [],
+        preferredRoles: JSON.stringify(validatedData.career_goals),
+        specificConcerns: JSON.stringify(validatedData.challenges || []),
         updatedAt: new Date(),
       },
       create: {
         userId: userId,
-        preferredRoles: validatedData.career_goals,
-        specificConcerns: validatedData.challenges || [],
+        preferredRoles: JSON.stringify(validatedData.career_goals),
+        specificConcerns: JSON.stringify(validatedData.challenges || []),
         createdAt: new Date(),
         updatedAt: new Date(),
       },

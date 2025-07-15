@@ -1,12 +1,12 @@
 // Prisma schema for UpMentor platform
-// Based on PRD reference docs
+// Supports both SQLite (local) and PostgreSQL (production)
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "postgresql"  // Use PostgreSQL by default (production)
   url      = env("DATABASE_URL")
 }
 
@@ -33,6 +33,12 @@ enum VerificationStatus {
   REJECTED
   SUSPENDED
   REAPPLICATION_REQUIRED
+}
+
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+  PHONE_VERIFICATION
 }
 
 model User {
@@ -62,11 +68,24 @@ model User {
   linkedinUrl        String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+  
+  // Enhanced authentication fields
   isVerified         Boolean  @default(false)
+  emailVerified      DateTime?
+  phoneVerified      DateTime?
   onboardingCompleted Boolean @default(false)
   lastActive         DateTime?
   accountStatus      AccountStatus @default(ACTIVE)
   parentEmail        String?
+  
+  // Security fields
+  loginAttempts      Int      @default(0)
+  lockedUntil        DateTime?
+  passwordResetAt    DateTime?
+  twoFactorEnabled   Boolean  @default(false)
+  twoFactorSecret    String?
+  
+  // Relations
   academicDetails    AcademicDetails[]
   careerPreferences  CareerPreferences[]
   userRoles          UserRole[]
@@ -74,7 +93,52 @@ model User {
   userProgress       UserProgress[]
   supportTickets     SupportTicket[]
   auditLogs          AuditLog[]
+  verificationTokens VerificationToken[]
+  accounts           Account[]
+  sessions_nextauth  SessionNextAuth[]
   mentor             Mentor? // One-to-one relation to Mentor
+}
+
+// Email verification and password reset tokens
+model VerificationToken {
+  id        String    @id @default(uuid())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  token     String    @unique
+  type      TokenType
+  expires   DateTime
+  used      Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  
+  @@unique([userId, type])
+}
+
+// NextAuth required models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model SessionNextAuth {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AcademicDetails {
@@ -86,19 +150,19 @@ model AcademicDetails {
   board          String?
   classGrade     String?
   stream         String?
-  subjects       String[]
-  extracurricular String[]
+  subjects       String?
+  extracurricular String?
   universityName String?
   degreeType     String?
   major          String?
   minor          String?
   semester       Int?
   cgpa           Float?
-  projects       String[]
-  internships    String[]
-  achievements   String[]
-  goals          String[]
-  challenges     String[]
+  projects       String?
+  internships    String?
+  achievements   String?
+  goals          String?
+  challenges     String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
@@ -107,12 +171,12 @@ model CareerPreferences {
   id                String   @id @default(uuid())
   user              User     @relation(fields: [userId], references: [id])
   userId            String   @unique
-  preferredRoles    String[]
-  targetCompanies   String[]
-  desiredLocations  String[]
+  preferredRoles    String?
+  targetCompanies   String?
+  desiredLocations  String?
   workPreferences   String?
   careerTimeline    String?
-  specificConcerns  String[]
+  specificConcerns  String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
@@ -125,15 +189,15 @@ model Mentor {
   university            String?
   company               String?
   experienceYears       Int?
-  expertiseAreas        String[]
-  academicSpecializations String[]
-  industryFocus         String[]
-  studentLevelsServed   String[]
+  expertiseAreas        String?
+  academicSpecializations String?
+  industryFocus         String?
+  studentLevelsServed   String?
   hourlyRate            Float?
   bio                   String?
   linkedinUrl           String?
   verificationStatus    VerificationStatus @default(PENDING)
-  verificationDocs      String[]
+  verificationDocs      String?
   verificationNotes     String?
   verifiedBy            String?
   verifiedAt            DateTime?
@@ -178,7 +242,7 @@ model UserRole {
   user         User     @relation(fields: [userId], references: [id])
   userId       String   @unique
   roleType     RoleType
-  permissions  String[]
+  permissions  String? // JSON array
   assignedBy   String?
   assignedAt   DateTime?
   isActive     Boolean  @default(true)
@@ -189,9 +253,9 @@ model AdminUser {
   userId           String
   adminType        String?
   department       String?
-  permissions      String[]
-  managedRegions   String[]
-  managedLanguages String[]
+  permissions      String?
+  managedRegions   String?
+  managedLanguages String?
   createdAt        DateTime @default(now())
 }
 
@@ -230,12 +294,12 @@ model Session {
   paymentId             String?
   sessionType           String?
   sessionLanguage       String?
-  userQuestions         String[]
+  userQuestions         String?
   mentorNotes           String?
   videoRoomId           String?
   recordingUrl          String?
   recordingAccessExpires DateTime?
-  followUpTasks         String[]
+  followUpTasks         String?
   satisfactionRating    Float?
   mentorRating          Float?
   createdAt             DateTime @default(now())
@@ -311,7 +375,7 @@ model UserProgress {
   mentorId       String?
   sessionId      String?
   progressNotes  String?
-  nextSteps      String[]
+  nextSteps      String?
 }
 
 model QualityReview {

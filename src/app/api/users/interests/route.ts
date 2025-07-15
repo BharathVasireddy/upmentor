@@ -20,7 +20,10 @@ export async function PUT(req: NextRequest) {
     })
     await prisma.academicDetails.updateMany({
       where: { userId },
-      data: { challenges, goals },
+      data: {
+        challenges: challenges ? JSON.stringify(challenges) : null,
+        goals: goals ? JSON.stringify(goals) : null,
+      },
     })
     return NextResponse.json(
       { user: { id: user.id, interests }, challenges, goals },

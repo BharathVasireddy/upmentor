@@ -34,7 +34,11 @@ export async function POST(request: NextRequest) {
       create: {
         userId: userId,
         roleType: 'STUDENT',
-        permissions: ['view_profile', 'book_sessions', 'view_mentors'],
+        permissions: JSON.stringify([
+          'view_profile',
+          'book_sessions',
+          'view_mentors',
+        ]),
         isActive: true,
         assignedAt: new Date(),
       },

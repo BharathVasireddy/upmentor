@@ -15,8 +15,15 @@ export async function POST(req: NextRequest) {
     const { userId, roleType, permissions } = parsed.data
     const userRole = await prisma.userRole.upsert({
       where: { userId },
-      update: { roleType, permissions },
-      create: { userId, roleType, permissions },
+      update: {
+        roleType,
+        permissions: permissions ? JSON.stringify(permissions) : null,
+      },
+      create: {
+        userId,
+        roleType,
+        permissions: permissions ? JSON.stringify(permissions) : null,
+      },
     })
     return NextResponse.json({ userRole }, { status: 200 })
   } catch (error) {

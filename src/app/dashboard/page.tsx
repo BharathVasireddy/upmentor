@@ -20,7 +20,9 @@ import {
   Calendar,
   TrendingUp,
 } from 'lucide-react'
-import WebsiteLayout from '@/components/layout/WebsiteLayout'
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
+import { DashboardRoute } from '@/components/auth/AuthGuard'
 
 export default function DashboardPage() {
   const [tasks, setTasks] = useState([
@@ -144,226 +146,237 @@ export default function DashboardPage() {
   ]
 
   return (
-    <WebsiteLayout>
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-slate-900">
-            Good morning, Arjun!
-          </h1>
-          <p className="text-slate-600">
-            You have 3 upcoming sessions and 2 pending tasks to complete.
-          </p>
-        </div>
+    <DashboardRoute>
+      <div className="min-h-screen bg-white dark:bg-neutral-900">
+        <Header />
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          {/* Welcome Section */}
+          <div className="mb-8">
+            <h1 className="mb-2 text-3xl font-bold text-slate-900 dark:text-white">
+              Good morning, Arjun!
+            </h1>
+            <p className="text-slate-600 dark:text-neutral-400">
+              You have 3 upcoming sessions and 2 pending tasks to complete.
+            </p>
+          </div>
 
-        {/* Stats Grid */}
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className="rounded-xl border border-slate-200 bg-white p-6"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-600">
-                    {stat.label}
-                  </p>
-                  <p className="mt-1 text-2xl font-bold text-slate-900">
-                    {stat.value}
-                  </p>
-                </div>
-                <div
-                  className={`h-12 w-12 ${stat.bgColor} flex items-center justify-center rounded-lg`}
-                >
-                  <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {/* Left Column - Projects & Tasks */}
-          <div className="space-y-8 lg:col-span-2">
-            {/* Active Projects */}
-            <div className="rounded-xl border border-slate-200 bg-white p-6">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-slate-900">
-                  Active Learning Paths
-                </h2>
-                <button className="text-slate-600 transition-colors hover:text-slate-900">
-                  <MoreVertical className="h-5 w-5" />
-                </button>
-              </div>
-              <div className="space-y-4">
-                {projects.map(project => (
-                  <div key={project.id} className="rounded-lg bg-slate-50 p-4">
-                    <div className="mb-3 flex items-start justify-between">
-                      <div>
-                        <h3 className="font-semibold text-slate-900">
-                          {project.title}
-                        </h3>
-                        <p className="text-sm text-slate-600">
-                          {project.subject}
-                        </p>
-                      </div>
-                      <span className="text-sm font-medium text-slate-700">
-                        {project.progress}%
-                      </span>
-                    </div>
-                    <div className="mb-3 h-2 w-full rounded-full bg-slate-200">
-                      <div
-                        className="h-2 rounded-full bg-slate-900 transition-all duration-300"
-                        style={{ width: `${project.progress}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex items-center justify-between text-sm text-slate-600">
-                      <span>Mentor: {project.mentor}</span>
-                      <span className="flex items-center">
-                        <Clock className="mr-1 h-4 w-4" />
-                        {project.nextSession}
-                      </span>
-                    </div>
+          {/* Stats Grid */}
+          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {stats.map((stat, index) => (
+              <div
+                key={index}
+                className="rounded-xl border border-slate-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-slate-600 dark:text-neutral-400">
+                      {stat.label}
+                    </p>
+                    <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">
+                      {stat.value}
+                    </p>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Quick Tasks */}
-            <div className="rounded-xl border border-slate-200 bg-white p-6">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-slate-900">
-                  Today's Tasks
-                </h2>
-                <button className="flex items-center text-slate-600 transition-colors hover:text-slate-900">
-                  <Plus className="mr-1 h-5 w-5" />
-                  Add Task
-                </button>
-              </div>
-              <div className="space-y-3">
-                {tasks.map(task => (
                   <div
-                    key={task.id}
-                    className="flex items-center rounded-lg p-3 transition-colors hover:bg-slate-50"
+                    className={`h-12 w-12 ${stat.bgColor} flex items-center justify-center rounded-lg dark:bg-neutral-700`}
                   >
-                    <button
-                      onClick={() => toggleTask(task.id)}
-                      className="mr-3 flex-shrink-0"
+                    <stat.icon
+                      className={`h-6 w-6 ${stat.color} dark:text-neutral-300`}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            {/* Left Column - Projects & Tasks */}
+            <div className="space-y-8 lg:col-span-2">
+              {/* Active Projects */}
+              <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
+                <div className="mb-6 flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                    Active Learning Paths
+                  </h2>
+                  <button className="text-slate-600 transition-colors hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white">
+                    <MoreVertical className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {projects.map(project => (
+                    <div
+                      key={project.id}
+                      className="rounded-lg bg-slate-50 p-4 dark:bg-neutral-700"
                     >
-                      {task.completed ? (
-                        <CheckCircle2 className="h-5 w-5 text-green-600" />
-                      ) : (
-                        <Circle className="h-5 w-5 text-slate-400" />
-                      )}
-                    </button>
-                    <div className="min-w-0 flex-1">
-                      <p
-                        className={`text-sm font-medium ${task.completed ? 'text-slate-500 line-through' : 'text-slate-900'}`}
-                      >
-                        {task.title}
-                      </p>
-                      <p className="text-xs text-slate-600">{task.subtitle}</p>
+                      <div className="mb-3 flex items-start justify-between">
+                        <div>
+                          <h3 className="font-semibold text-slate-900 dark:text-white">
+                            {project.title}
+                          </h3>
+                          <p className="text-sm text-slate-600 dark:text-neutral-400">
+                            {project.subject}
+                          </p>
+                        </div>
+                        <span className="text-sm font-medium text-slate-700 dark:text-neutral-300">
+                          {project.progress}%
+                        </span>
+                      </div>
+                      <div className="mb-3 h-2 w-full rounded-full bg-slate-200 dark:bg-neutral-600">
+                        <div
+                          className="h-2 rounded-full bg-slate-900 transition-all duration-300 dark:bg-brand-500"
+                          style={{ width: `${project.progress}%` }}
+                        ></div>
+                      </div>
+                      <div className="flex items-center justify-between text-sm text-slate-600 dark:text-neutral-400">
+                        <span>Mentor: {project.mentor}</span>
+                        <span className="flex items-center">
+                          <Clock className="mr-1 h-4 w-4" />
+                          {project.nextSession}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Right Column - Upcoming Sessions & Quick Actions */}
-          <div className="space-y-8">
-            {/* Upcoming Sessions */}
-            <div className="rounded-xl border border-slate-200 bg-white p-6">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-slate-900">
-                  Upcoming Sessions
-                </h2>
-                <button className="text-slate-600 transition-colors hover:text-slate-900">
-                  <Calendar className="h-5 w-5" />
-                </button>
-              </div>
-              <div className="space-y-4">
-                {upcomingSessions.map(session => (
-                  <div
-                    key={session.id}
-                    className="rounded-lg border border-slate-200 p-4"
-                  >
-                    <div className="mb-2 flex items-start justify-between">
-                      <div>
-                        <h3 className="text-sm font-semibold text-slate-900">
-                          {session.subject}
-                        </h3>
-                        <p className="text-xs text-slate-600">
-                          {session.mentor}
+              {/* Quick Tasks */}
+              <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
+                <div className="mb-6 flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                    Today's Tasks
+                  </h2>
+                  <button className="flex items-center text-slate-600 transition-colors hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white">
+                    <Plus className="mr-1 h-5 w-5" />
+                    Add Task
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  {tasks.map(task => (
+                    <div
+                      key={task.id}
+                      className="flex items-center rounded-lg p-3 transition-colors hover:bg-slate-50 dark:hover:bg-neutral-700"
+                    >
+                      <button
+                        onClick={() => toggleTask(task.id)}
+                        className="mr-3 flex-shrink-0"
+                      >
+                        {task.completed ? (
+                          <CheckCircle2 className="h-5 w-5 text-green-600" />
+                        ) : (
+                          <Circle className="h-5 w-5 text-slate-400 dark:text-neutral-500" />
+                        )}
+                      </button>
+                      <div className="min-w-0 flex-1">
+                        <p
+                          className={`text-sm font-medium ${task.completed ? 'text-slate-500 line-through dark:text-neutral-500' : 'text-slate-900 dark:text-white'}`}
+                        >
+                          {task.title}
+                        </p>
+                        <p className="text-xs text-slate-600 dark:text-neutral-400">
+                          {task.subtitle}
                         </p>
                       </div>
-                      <span className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-700">
-                        {session.type}
-                      </span>
                     </div>
-                    <div className="flex items-center justify-between text-xs text-slate-600">
-                      <span className="flex items-center">
-                        <Clock className="mr-1 h-3 w-3" />
-                        {session.time}
-                      </span>
-                      <span>{session.duration}</span>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-              <button className="mt-4 w-full rounded-lg py-2 text-center text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900">
-                View All Sessions
-              </button>
             </div>
 
-            {/* Quick Actions */}
-            <div className="rounded-xl border border-slate-200 bg-white p-6">
-              <h2 className="mb-6 text-xl font-semibold text-slate-900">
-                Quick Actions
-              </h2>
-              <div className="space-y-3">
-                <button className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-slate-50">
-                  <div className="flex items-center">
-                    <Users className="mr-3 h-5 w-5 text-slate-600" />
-                    <span className="text-sm font-medium text-slate-900">
-                      Find New Mentors
-                    </span>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-slate-400" />
+            {/* Right Column - Upcoming Sessions & Quick Actions */}
+            <div className="space-y-8">
+              {/* Upcoming Sessions */}
+              <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
+                <div className="mb-6 flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                    Upcoming Sessions
+                  </h2>
+                  <button className="text-slate-600 transition-colors hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white">
+                    <Calendar className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {upcomingSessions.map(session => (
+                    <div
+                      key={session.id}
+                      className="rounded-lg border border-slate-200 p-4 dark:border-neutral-600"
+                    >
+                      <div className="mb-2 flex items-start justify-between">
+                        <div>
+                          <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                            {session.subject}
+                          </h3>
+                          <p className="text-xs text-slate-600 dark:text-neutral-400">
+                            {session.mentor}
+                          </p>
+                        </div>
+                        <span className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-700 dark:bg-neutral-700 dark:text-neutral-300">
+                          {session.type}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-slate-600 dark:text-neutral-400">
+                        <span className="flex items-center">
+                          <Clock className="mr-1 h-3 w-3" />
+                          {session.time}
+                        </span>
+                        <span>{session.duration}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button className="mt-4 w-full rounded-lg py-2 text-center text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-white">
+                  View All Sessions
                 </button>
-                <button className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-slate-50">
-                  <div className="flex items-center">
-                    <Calendar className="mr-3 h-5 w-5 text-slate-600" />
-                    <span className="text-sm font-medium text-slate-900">
-                      Schedule Session
-                    </span>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-slate-400" />
-                </button>
-                <button className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-slate-50">
-                  <div className="flex items-center">
-                    <TrendingUp className="mr-3 h-5 w-5 text-slate-600" />
-                    <span className="text-sm font-medium text-slate-900">
-                      View Progress
-                    </span>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-slate-400" />
-                </button>
-                <button className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-slate-50">
-                  <div className="flex items-center">
-                    <Settings className="mr-3 h-5 w-5 text-slate-600" />
-                    <span className="text-sm font-medium text-slate-900">
-                      Account Settings
-                    </span>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-slate-400" />
-                </button>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
+                <h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">
+                  Quick Actions
+                </h2>
+                <div className="space-y-3">
+                  <button className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-slate-50 dark:hover:bg-neutral-700">
+                    <div className="flex items-center">
+                      <Users className="mr-3 h-5 w-5 text-slate-600 dark:text-neutral-400" />
+                      <span className="text-sm font-medium text-slate-900 dark:text-white">
+                        Find New Mentors
+                      </span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-slate-400 dark:text-neutral-500" />
+                  </button>
+                  <button className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-slate-50 dark:hover:bg-neutral-700">
+                    <div className="flex items-center">
+                      <Calendar className="mr-3 h-5 w-5 text-slate-600 dark:text-neutral-400" />
+                      <span className="text-sm font-medium text-slate-900 dark:text-white">
+                        Schedule Session
+                      </span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-slate-400 dark:text-neutral-500" />
+                  </button>
+                  <button className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-slate-50 dark:hover:bg-neutral-700">
+                    <div className="flex items-center">
+                      <TrendingUp className="mr-3 h-5 w-5 text-slate-600 dark:text-neutral-400" />
+                      <span className="text-sm font-medium text-slate-900 dark:text-white">
+                        View Progress
+                      </span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-slate-400 dark:text-neutral-500" />
+                  </button>
+                  <button className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-slate-50 dark:hover:bg-neutral-700">
+                    <div className="flex items-center">
+                      <Settings className="mr-3 h-5 w-5 text-slate-600 dark:text-neutral-400" />
+                      <span className="text-sm font-medium text-slate-900 dark:text-white">
+                        Account Settings
+                      </span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-slate-400 dark:text-neutral-500" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        <Footer />
       </div>
-    </WebsiteLayout>
+    </DashboardRoute>
   )
 }

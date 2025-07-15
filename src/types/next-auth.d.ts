@@ -1,25 +1,39 @@
 import NextAuth from 'next-auth'
+import { JWT } from 'next-auth/jwt'
+import { RoleType, VerificationStatus } from '@prisma/client'
 
 declare module 'next-auth' {
   interface Session {
     user: {
       id: string
-      name?: string | null
-      email?: string | null
-      image?: string | null
+      email: string
+      name: string
+      image?: string
+      roles: RoleType[]
+      isVerified: boolean
+      onboardingCompleted: boolean
+      mentorVerificationStatus: VerificationStatus | null
     }
   }
 
   interface User {
     id: string
-    name?: string | null
-    email?: string | null
-    image?: string | null
+    email: string
+    name: string
+    image?: string
+    roles: RoleType[]
+    isVerified: boolean
+    onboardingCompleted: boolean
+    mentorVerificationStatus: VerificationStatus | null
   }
 }
 
 declare module 'next-auth/jwt' {
   interface JWT {
-    sub: string
+    userId: string
+    roles: RoleType[]
+    isVerified: boolean
+    onboardingCompleted: boolean
+    mentorVerificationStatus: VerificationStatus | null
   }
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { Button } from '@/components/ui/button'
 
 type Props = {
   value: 'school' | 'college'
@@ -10,20 +11,20 @@ type Props = {
 export default function AcademicLevelSelector({ value, onChange }: Props) {
   return (
     <div className="my-4 flex justify-center gap-4">
-      <button
+      <Button
         type="button"
-        className={`rounded border px-4 py-2 font-semibold ${value === 'school' ? 'bg-blue-600 text-white' : 'border-gray-300 bg-white'}`}
+        variant={value === 'school' ? 'default' : 'outline'}
         onClick={() => onChange('school')}
       >
         School
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
-        className={`rounded border px-4 py-2 font-semibold ${value === 'college' ? 'bg-blue-600 text-white' : 'border-gray-300 bg-white'}`}
+        variant={value === 'college' ? 'default' : 'outline'}
         onClick={() => onChange('college')}
       >
         College
-      </button>
+      </Button>
     </div>
   )
 }

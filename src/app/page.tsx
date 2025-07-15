@@ -1,410 +1,374 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 import {
-  ArrowRight,
-  BookOpen,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
+import {
   Users,
+  BookOpen,
   Target,
+  ArrowRight,
+  CheckCircle,
   Star,
-  Check,
-  Shield,
-  Clock,
-  Globe,
-  GraduationCap,
-  Award,
   TrendingUp,
-  Search,
-  Calendar,
+  Shield,
+  Zap,
 } from 'lucide-react'
-import WebsiteLayout from '@/components/layout/WebsiteLayout'
 
-export default function LandingPage() {
-  const router = useRouter()
-
-  const features = [
-    {
-      icon: Users,
-      title: 'Expert Mentors',
-      description:
-        'Connect with verified professionals and academics who understand your journey.',
-    },
-    {
-      icon: Globe,
-      title: 'Language Support',
-      description:
-        'Get guidance in your preferred language with culturally aware mentors.',
-    },
-    {
-      icon: Target,
-      title: 'Personalized Goals',
-      description:
-        'Tailored mentorship based on your academic level and career aspirations.',
-    },
-    {
-      icon: Shield,
-      title: 'Verified Profiles',
-      description:
-        'All mentors are background-checked and verified for your safety.',
-    },
-    {
-      icon: Clock,
-      title: 'Flexible Scheduling',
-      description:
-        'Book sessions that fit your schedule with easy rescheduling options.',
-    },
-    {
-      icon: BookOpen,
-      title: 'Progress Tracking',
-      description:
-        'Monitor your growth with detailed progress reports and milestones.',
-    },
-  ]
-
-  const steps = [
-    {
-      step: '1',
-      title: 'Sign Up',
-      description: 'Create your profile and tell us about your goals',
-      icon: Users,
-    },
-    {
-      step: '2',
-      title: 'Find Mentors',
-      description: 'Browse verified mentors in your field and language',
-      icon: TrendingUp,
-    },
-    {
-      step: '3',
-      title: 'Book Session',
-      description: 'Schedule a session at your convenient time',
-      icon: Calendar,
-    },
-    {
-      step: '4',
-      title: 'Learn & Grow',
-      description: 'Get personalized guidance and track your progress',
-      icon: TrendingUp,
-    },
-  ]
-
-  const testimonials = [
-    {
-      name: 'Priya Sharma',
-      role: 'Engineering Student',
-      content:
-        'My mentor helped me crack JEE Advanced and guided me through college applications. The personalized approach made all the difference.',
-      rating: 5,
-      avatar: '/api/placeholder/48/48',
-    },
-    {
-      name: 'Arjun Patel',
-      role: 'MBA Aspirant',
-      content:
-        'Got amazing career guidance in Hindi. My mentor understood the Indian job market and helped me land my dream job.',
-      rating: 5,
-      avatar: '/api/placeholder/48/48',
-    },
-    {
-      name: 'Sneha Reddy',
-      role: 'Medical Student',
-      content:
-        'The NEET preparation sessions were incredibly helpful. Having a mentor who spoke Telugu made learning so much easier.',
-      rating: 5,
-      avatar: '/api/placeholder/48/48',
-    },
-  ]
-
-  const plans = [
-    {
-      name: 'Basic',
-      price: '₹999',
-      period: 'per session',
-      features: [
-        '1-on-1 video sessions',
-        'Session recordings',
-        'Basic progress tracking',
-        'Email support',
-      ],
-    },
-    {
-      name: 'Pro',
-      price: '₹4999',
-      period: 'per month',
-      features: [
-        'Unlimited sessions',
-        'Priority mentor matching',
-        'Advanced analytics',
-        'WhatsApp support',
-        'Career resources',
-      ],
-      popular: true,
-    },
-    {
-      name: 'Enterprise',
-      price: 'Custom',
-      period: 'for institutions',
-      features: [
-        'Bulk student accounts',
-        'Institution dashboard',
-        'Custom integrations',
-        'Dedicated support',
-        'Custom reporting',
-      ],
-    },
-  ]
-
+export default function HomePage() {
   return (
-    <WebsiteLayout>
+    <div className="min-h-screen bg-white">
+      <Header showBeta={true} />
+
       {/* Hero Section */}
-      <section className="bg-white py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="mb-8 inline-flex items-center rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
-              <GraduationCap className="mr-2 h-4 w-4" />
-              Trusted by 10,000+ students
-            </div>
-            <h1 className="mb-6 text-4xl font-bold text-slate-900 md:text-6xl">
-              Find Your Perfect
-              <span className="block text-slate-900">Mentor</span>
+      <section className="px-4 pb-16 pt-20 sm:px-6 lg:px-8">
+        <div className="container mx-auto max-w-4xl text-center">
+          <div className="mb-8">
+            <h1 className="mb-6 font-display text-5xl font-bold leading-tight text-neutral-900 sm:text-6xl">
+              Connect with
+              <span className="text-brand-600">
+                {' '}
+                Professors & Certified Experts
+              </span>
             </h1>
-            <p className="mx-auto mb-10 max-w-3xl text-xl leading-relaxed text-slate-600">
-              Connect with expert mentors who understand your academic journey
-              and career goals. Get personalized guidance in your preferred
-              language.
+            <p className="mx-auto mb-8 max-w-2xl text-xl leading-relaxed text-neutral-600">
+              Get personalized guidance from university professors and certified
+              industry professionals. Our exclusive network of verified experts
+              will accelerate your academic and career growth.
             </p>
-            <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <button
-                onClick={() => router.push('/mentors')}
-                className="flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-8 py-4 text-lg font-semibold text-white transition-colors hover:bg-slate-800"
-              >
-                Find Mentors
+          </div>
+
+          <div className="mb-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Button size="xl" asChild className="min-w-48">
+              <Link href="/register" className="flex items-center gap-2">
+                Start Learning
                 <ArrowRight className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => router.push('/register')}
-                className="rounded-lg border-2 border-slate-900 px-8 py-4 text-lg font-semibold text-slate-900 transition-colors hover:bg-slate-50"
-              >
-                Get Started Free
-              </button>
+              </Link>
+            </Button>
+            <Button variant="outline" size="xl" asChild className="min-w-48">
+              <Link href="/mentors">Browse Mentors</Link>
+            </Button>
+          </div>
+
+          {/* Stats */}
+          <div className="mx-auto grid max-w-2xl grid-cols-1 gap-8 sm:grid-cols-3">
+            <div className="text-center">
+              <div className="mb-1 font-display text-3xl font-bold text-neutral-900">
+                5,000+
+              </div>
+              <div className="text-sm text-neutral-600">Active Learners</div>
+            </div>
+            <div className="text-center">
+              <div className="mb-1 font-display text-3xl font-bold text-neutral-900">
+                500+
+              </div>
+              <div className="text-sm text-neutral-600">Expert Mentors</div>
+            </div>
+            <div className="text-center">
+              <div className="mb-1 font-display text-3xl font-bold text-neutral-900">
+                95%
+              </div>
+              <div className="text-sm text-neutral-600">Success Rate</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="bg-slate-50 py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="bg-neutral-50 py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
-            <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl">
+            <h2 className="mb-4 font-display text-4xl font-bold text-neutral-900">
               Why Choose UpMentor?
             </h2>
-            <p className="mx-auto max-w-2xl text-xl text-slate-600">
-              We connect you with verified mentors who speak your language and
-              understand your goals.
+            <p className="mx-auto max-w-2xl text-lg text-neutral-600">
+              We've built the most comprehensive platform for professional
+              growth and career advancement.
             </p>
           </div>
+
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="rounded-xl border border-slate-200 bg-white p-8 transition-shadow hover:shadow-lg"
-              >
-                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100">
-                  <feature.icon className="h-6 w-6 text-slate-700" />
+            <Card className="border-0 shadow-medium">
+              <CardHeader>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-100">
+                  <Users className="h-6 w-6 text-brand-600" />
                 </div>
-                <h3 className="mb-3 text-xl font-semibold text-slate-900">
-                  {feature.title}
-                </h3>
-                <p className="leading-relaxed text-slate-600">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
+                <CardTitle>Professors & Certified Experts</CardTitle>
+                <CardDescription>
+                  Learn from university professors and certified professionals
+                  from top institutions and companies like MIT, Stanford,
+                  Google, and Meta.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="border-0 shadow-medium">
+              <CardHeader>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50">
+                  <Target className="h-6 w-6 text-brand-700" />
+                </div>
+                <CardTitle>Personalized Learning</CardTitle>
+                <CardDescription>
+                  Get customized learning paths and career guidance tailored to
+                  your specific goals.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="border-0 shadow-medium">
+              <CardHeader>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-neutral-100">
+                  <BookOpen className="h-6 w-6 text-neutral-700" />
+                </div>
+                <CardTitle>Structured Sessions</CardTitle>
+                <CardDescription>
+                  Organized mentorship sessions with clear objectives and
+                  measurable outcomes.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="border-0 shadow-medium">
+              <CardHeader>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-100">
+                  <TrendingUp className="h-6 w-6 text-brand-600" />
+                </div>
+                <CardTitle>Track Progress</CardTitle>
+                <CardDescription>
+                  Monitor your growth with detailed analytics and milestone
+                  tracking.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="border-0 shadow-medium">
+              <CardHeader>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-neutral-100">
+                  <Shield className="h-6 w-6 text-neutral-700" />
+                </div>
+                <CardTitle>Secure Platform</CardTitle>
+                <CardDescription>
+                  Your data and conversations are protected with
+                  enterprise-grade security.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="border-0 shadow-medium">
+              <CardHeader>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50">
+                  <Zap className="h-6 w-6 text-brand-700" />
+                </div>
+                <CardTitle>Instant Matching</CardTitle>
+                <CardDescription>
+                  Find the perfect mentor in minutes with our AI-powered
+                  matching algorithm.
+                </CardDescription>
+              </CardHeader>
+            </Card>
           </div>
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="bg-white py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      {/* How It Works */}
+      <section className="py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
-            <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl">
+            <h2 className="mb-4 font-display text-4xl font-bold text-neutral-900">
               How It Works
             </h2>
-            <p className="mx-auto max-w-2xl text-xl text-slate-600">
-              Get started with mentorship in just a few simple steps.
+            <p className="mx-auto max-w-2xl text-lg text-neutral-600">
+              Get started with mentorship in three simple steps.
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {steps.map((item, index) => (
-              <div key={index} className="text-center">
-                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-slate-900 text-xl font-bold text-white">
-                  {item.step}
-                </div>
-                <h3 className="mb-3 text-xl font-semibold text-slate-900">
-                  {item.title}
-                </h3>
-                <p className="leading-relaxed text-slate-600">
-                  {item.description}
-                </p>
+
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+            <div className="text-center">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-600 text-2xl font-bold text-white">
+                1
               </div>
-            ))}
+              <h3 className="mb-4 font-display text-xl font-semibold text-neutral-900">
+                Create Your Profile
+              </h3>
+              <p className="leading-relaxed text-neutral-600">
+                Tell us about your background, goals, and what you're looking to
+                achieve in your career.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-600 text-2xl font-bold text-white">
+                2
+              </div>
+              <h3 className="mb-4 font-display text-xl font-semibold text-neutral-900">
+                Find Your Mentor
+              </h3>
+              <p className="leading-relaxed text-neutral-600">
+                Browse our curated list of mentors or let our AI match you with
+                the perfect fit.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-600 text-2xl font-bold text-white">
+                3
+              </div>
+              <h3 className="mb-4 font-display text-xl font-semibold text-neutral-900">
+                Start Growing
+              </h3>
+              <p className="leading-relaxed text-neutral-600">
+                Schedule sessions, set goals, and track your progress as you
+                advance in your career.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Statistics Section */}
-      <section className="bg-slate-50 py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-            {[
-              { value: '10,000+', label: 'Students', icon: Users },
-              { value: '500+', label: 'Expert Mentors', icon: Award },
-              { value: '25+', label: 'Languages', icon: Globe },
-              { value: '95%', label: 'Success Rate', icon: Target },
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-white">
-                  <stat.icon className="h-6 w-6 text-slate-700" />
-                </div>
-                <div className="mb-2 text-3xl font-bold text-slate-900">
-                  {stat.value}
-                </div>
-                <div className="text-slate-600">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="bg-white py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      {/* Testimonials */}
+      <section className="bg-neutral-50 py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
-            <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl">
-              What Students Say
+            <h2 className="mb-4 font-display text-4xl font-bold text-neutral-900">
+              What Our Users Say
             </h2>
-            <p className="mx-auto max-w-2xl text-xl text-slate-600">
-              Real stories from students who found success with our mentors.
+            <p className="mx-auto max-w-2xl text-lg text-neutral-600">
+              Join thousands of professionals who have accelerated their careers
+              with UpMentor.
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="rounded-xl bg-slate-50 p-8">
-                <div className="mb-4 flex">
-                  {[...Array(testimonial.rating)].map((_, i) => (
+
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <Card className="border-0 shadow-medium">
+              <CardHeader>
+                <div className="mb-4 flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className="h-5 w-5 fill-current text-yellow-500"
+                      className="fill-warning-400 text-warning-400 h-4 w-4"
                     />
                   ))}
                 </div>
-                <p className="mb-6 italic leading-relaxed text-slate-700">
-                  "{testimonial.content}"
-                </p>
-                <div className="flex items-center">
-                  <img
-                    src={testimonial.avatar}
-                    alt={testimonial.name}
-                    className="mr-4 h-12 w-12 rounded-full"
-                  />
-                  <div>
-                    <p className="font-semibold text-slate-900">
-                      {testimonial.name}
-                    </p>
-                    <p className="text-sm text-slate-600">{testimonial.role}</p>
-                  </div>
+                <CardDescription className="text-base leading-relaxed">
+                  "UpMentor connected me with an amazing mentor who helped me
+                  transition into tech. I landed my dream job at a Fortune 500
+                  company within 6 months!"
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="border-t border-neutral-100 pt-4">
+                <div className="font-medium text-neutral-900">Sarah Chen</div>
+                <div className="text-sm text-neutral-600">
+                  Software Engineer at Google
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+              </CardContent>
+            </Card>
 
-      {/* Pricing Section */}
-      <section className="bg-slate-50 py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-16 text-center">
-            <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl">
-              Simple, Transparent Pricing
-            </h2>
-            <p className="mx-auto max-w-2xl text-xl text-slate-600">
-              Choose the plan that works best for your learning journey.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {plans.map((plan, index) => (
-              <div
-                key={index}
-                className={`relative rounded-xl border bg-white p-8 shadow-sm ${plan.popular ? 'border-slate-900 ring-2 ring-slate-900' : 'border-slate-200'}`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 transform">
-                    <span className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                <div className="mb-8 text-center">
-                  <h3 className="mb-2 text-2xl font-bold text-slate-900">
-                    {plan.name}
-                  </h3>
-                  <div className="mb-2 text-4xl font-bold text-slate-900">
-                    {plan.price}
-                  </div>
-                  <p className="text-slate-600">{plan.period}</p>
-                </div>
-                <ul className="mb-8 space-y-4">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center">
-                      <Check className="mr-3 h-5 w-5 text-green-600" />
-                      <span className="text-slate-700">{feature}</span>
-                    </li>
+            <Card className="border-0 shadow-medium">
+              <CardHeader>
+                <div className="mb-4 flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className="fill-warning-400 text-warning-400 h-4 w-4"
+                    />
                   ))}
-                </ul>
-                <button
-                  onClick={() => router.push('/register')}
-                  className={`w-full rounded-lg py-3 font-semibold transition-colors ${
-                    plan.popular
-                      ? 'bg-slate-900 text-white hover:bg-slate-800'
-                      : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
-                  }`}
-                >
-                  Get Started
-                </button>
-              </div>
-            ))}
+                </div>
+                <CardDescription className="text-base leading-relaxed">
+                  "The personalized guidance I received was invaluable. My
+                  mentor helped me develop leadership skills and I was promoted
+                  to Senior Manager."
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="border-t border-neutral-100 pt-4">
+                <div className="font-medium text-neutral-900">
+                  Michael Rodriguez
+                </div>
+                <div className="text-sm text-neutral-600">
+                  Senior Manager at Amazon
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-medium">
+              <CardHeader>
+                <div className="mb-4 flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className="fill-warning-400 text-warning-400 h-4 w-4"
+                    />
+                  ))}
+                </div>
+                <CardDescription className="text-base leading-relaxed">
+                  "As a career changer, I was lost. UpMentor matched me with
+                  someone who had made the same transition. Their insights were
+                  game-changing."
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="border-t border-neutral-100 pt-4">
+                <div className="font-medium text-neutral-900">
+                  Emily Johnson
+                </div>
+                <div className="text-sm text-neutral-600">
+                  Product Designer at Meta
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="bg-slate-900 py-24">
-        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">
-            Ready to Start Your Journey?
-          </h2>
-          <p className="mx-auto mb-10 max-w-2xl text-xl text-slate-300">
-            Join thousands of students who are already getting personalized
-            mentorship.
-          </p>
-          <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <button
-              onClick={() => router.push('/register')}
-              className="rounded-lg bg-white px-8 py-4 text-lg font-semibold text-slate-900 transition-colors hover:bg-slate-100"
-            >
-              Get Started Free
-            </button>
-            <button
-              onClick={() => router.push('/mentors')}
-              className="rounded-lg border-2 border-white px-8 py-4 text-lg font-semibold text-white transition-colors hover:bg-white hover:text-slate-900"
-            >
-              Browse Mentors
-            </button>
+      <section className="py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-4xl text-center">
+            <h2 className="mb-6 font-display text-4xl font-bold text-neutral-900">
+              Ready to Transform Your Career?
+            </h2>
+            <p className="mx-auto mb-8 max-w-2xl text-xl leading-relaxed text-neutral-600">
+              Join UpMentor today and connect with mentors who will guide you to
+              success. Your future self will thank you.
+            </p>
+
+            <div className="mb-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Button size="xl" asChild className="min-w-48">
+                <Link href="/register" className="flex items-center gap-2">
+                  Start Your Journey
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </Button>
+              <Button variant="outline" size="xl" asChild className="min-w-48">
+                <Link href="/login">Sign In</Link>
+              </Button>
+            </div>
+
+            <div className="flex items-center justify-center gap-6 text-sm text-neutral-500">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-success-500" />
+                Free to get started
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-success-500" />
+                No credit card required
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-success-500" />
+                Cancel anytime
+              </div>
+            </div>
           </div>
         </div>
       </section>
-    </WebsiteLayout>
+
+      <Footer />
+    </div>
   )
 }
