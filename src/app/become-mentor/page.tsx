@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { Button } from '@/components/ui/button'
@@ -31,7 +32,198 @@ import {
   Globe,
   Shield,
   Upload,
+  X,
+  FileText,
+  Mail,
+  Loader2,
 } from 'lucide-react'
+
+// Success Modal Component
+const SuccessModal = ({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean
+  onClose: () => void
+}) => {
+  const router = useRouter()
+
+  if (!isOpen) return null
+
+  const handleGoToDashboard = () => {
+    router.push('/dashboard?mentor=true')
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="mx-4 max-w-md rounded-lg bg-white p-6 shadow-xl">
+        <div className="text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+            <CheckCircle className="h-8 w-8 text-green-600" />
+          </div>
+
+          <h3 className="mb-2 text-xl font-semibold text-neutral-900">
+            Application Submitted Successfully!
+          </h3>
+
+          <p className="mb-6 text-neutral-600">
+            Thank you for applying to become a mentor. We'll review your
+            application and get back to you within 2-3 business days.
+          </p>
+
+          <div className="mb-6 rounded-lg bg-blue-50 p-4">
+            <div className="mb-2 flex items-center gap-2">
+              <Mail className="h-5 w-5 text-blue-600" />
+              <span className="font-medium text-blue-900">What's Next?</span>
+            </div>
+            <ul className="space-y-1 text-sm text-blue-800">
+              <li>• Check your email for confirmation</li>
+              <li>• We'll verify your documents</li>
+              <li>• Interview scheduling (if approved)</li>
+              <li>• Welcome to the mentor community!</li>
+            </ul>
+          </div>
+
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={onClose} className="flex-1">
+              Close
+            </Button>
+            <Button
+              onClick={handleGoToDashboard}
+              className="flex-1 bg-brand-600 hover:bg-brand-700"
+            >
+              Go to Dashboard
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// File Upload Component
+const FileUpload = ({
+  label,
+  accept,
+  required = false,
+  file,
+  onFileChange,
+  description,
+}: {
+  label: string
+  accept: string
+  required?: boolean
+  file: File | null
+  onFileChange: (file: File | null) => void
+  description: string
+}) => {
+  const [dragOver, setDragOver] = useState(false)
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setDragOver(false)
+
+    const files = e.dataTransfer.files
+    if (files.length > 0) {
+      const file = files[0]
+      if (validateFile(file)) {
+        onFileChange(file)
+      }
+    }
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (files && files.length > 0) {
+      const file = files[0]
+      if (validateFile(file)) {
+        onFileChange(file)
+      }
+    }
+  }
+
+  const validateFile = (file: File) => {
+    const maxSize = 10 * 1024 * 1024 // 10MB
+    const allowedTypes = accept.split(',').map(type => type.trim())
+
+    if (file.size > maxSize) {
+      alert('File size must be less than 10MB')
+      return false
+    }
+
+    const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase()
+    if (
+      !allowedTypes.some(
+        type =>
+          type.includes(fileExtension) ||
+          file.type.includes(type.replace('.', ''))
+      )
+    ) {
+      alert(`File type not allowed. Please upload: ${accept}`)
+      return false
+    }
+
+    return true
+  }
+
+  const removeFile = () => {
+    onFileChange(null)
+  }
+
+  return (
+    <div>
+      <Label className="mb-2 block">
+        {label} {required && <span className="text-red-500">*</span>}
+      </Label>
+
+      {file ? (
+        <div className="flex items-center justify-between rounded-lg border border-green-200 bg-green-50 p-4">
+          <div className="flex items-center gap-3">
+            <FileText className="h-8 w-8 text-green-600" />
+            <div>
+              <p className="font-medium text-green-900">{file.name}</p>
+              <p className="text-sm text-green-700">
+                {(file.size / 1024 / 1024).toFixed(2)} MB
+              </p>
+            </div>
+          </div>
+          <Button variant="ghost" size="sm" onClick={removeFile}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      ) : (
+        <div
+          className={`cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
+            dragOver
+              ? 'border-brand-400 bg-brand-50'
+              : 'border-neutral-300 hover:border-neutral-400'
+          }`}
+          onDrop={handleDrop}
+          onDragOver={e => {
+            e.preventDefault()
+            setDragOver(true)
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onClick={() => document.getElementById(`file-${label}`)?.click()}
+        >
+          <Upload className="mx-auto mb-2 h-8 w-8 text-neutral-400" />
+          <p className="mb-1 text-sm text-neutral-600">
+            Click to upload or drag and drop
+          </p>
+          <p className="text-xs text-neutral-500">{description}</p>
+
+          <input
+            id={`file-${label}`}
+            type="file"
+            accept={accept}
+            className="hidden"
+            onChange={handleFileSelect}
+          />
+        </div>
+      )}
+    </div>
+  )
+}
 
 const steps = [
   { id: 1, title: 'Personal Info', description: 'Basic information about you' },
@@ -151,6 +343,10 @@ interface FormData {
 
 export default function BecomeMentorPage() {
   const [currentStep, setCurrentStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const router = useRouter()
+
   const [formData, setFormData] = useState<FormData>({
     // Personal Info
     firstName: '',
@@ -198,6 +394,19 @@ export default function BecomeMentorPage() {
     }))
   }
 
+  const handleDocumentChange = (
+    docType: keyof FormData['documents'],
+    file: File | null
+  ) => {
+    setFormData(prev => ({
+      ...prev,
+      documents: {
+        ...prev.documents,
+        [docType]: file,
+      },
+    }))
+  }
+
   const handleArrayChange = (
     field: keyof FormData,
     value: string,
@@ -215,9 +424,51 @@ export default function BecomeMentorPage() {
     })
   }
 
+  const validateStep = (step: number): boolean => {
+    switch (step) {
+      case 1:
+        return !!(
+          formData.firstName &&
+          formData.lastName &&
+          formData.email &&
+          formData.phone &&
+          formData.city &&
+          formData.state
+        )
+      case 2:
+        return !!(
+          formData.currentTitle &&
+          formData.currentCompany &&
+          formData.university &&
+          formData.degree &&
+          formData.experienceYears &&
+          formData.bio
+        )
+      case 3:
+        return !!(
+          formData.subjectsToTeach.length > 0 &&
+          formData.studentLevels.length > 0 &&
+          formData.languagesSpoken.length > 0 &&
+          formData.hourlyRate
+        )
+      case 4:
+        return !!(
+          formData.documents.resume &&
+          formData.documents.degreeProof &&
+          formData.documents.idProof &&
+          formData.agreeToTerms &&
+          formData.agreeToBackground
+        )
+      default:
+        return false
+    }
+  }
+
   const nextStep = () => {
-    if (currentStep < steps.length) {
+    if (validateStep(currentStep) && currentStep < steps.length) {
       setCurrentStep(currentStep + 1)
+    } else if (!validateStep(currentStep)) {
+      alert('Please fill in all required fields before proceeding.')
     }
   }
 
@@ -228,11 +479,51 @@ export default function BecomeMentorPage() {
   }
 
   const handleSubmit = async () => {
-    // TODO: Implement API call to submit mentor application
-    console.log('Mentor application submitted:', formData)
-    alert(
-      'Application submitted successfully! We will review your application and get back to you within 2-3 business days.'
-    )
+    if (!validateStep(4)) {
+      alert('Please complete all required fields and upload documents.')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      // Create FormData for file upload
+      const submitData = new FormData()
+
+      // Add all form fields
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === 'documents') {
+          Object.entries(value).forEach(([docKey, file]) => {
+            if (file) {
+              submitData.append(docKey, file)
+            }
+          })
+        } else if (Array.isArray(value)) {
+          submitData.append(key, JSON.stringify(value))
+        } else if (typeof value === 'boolean') {
+          submitData.append(key, value.toString())
+        } else {
+          submitData.append(key, value as string)
+        }
+      })
+
+      // TODO: Replace with actual API call
+      const response = await fetch('/api/mentors/apply', {
+        method: 'POST',
+        body: submitData,
+      })
+
+      if (response.ok) {
+        setShowSuccessModal(true)
+      } else {
+        throw new Error('Application submission failed')
+      }
+    } catch (error) {
+      console.error('Error submitting application:', error)
+      alert('There was an error submitting your application. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const renderPersonalInfo = () => (
@@ -522,61 +813,41 @@ export default function BecomeMentorPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div>
-          <Label>Resume/CV *</Label>
-          <div className="mt-2 flex items-center justify-center rounded-lg border-2 border-dashed border-neutral-300 p-6">
-            <div className="text-center">
-              <Upload className="mx-auto h-8 w-8 text-neutral-400" />
-              <p className="mt-2 text-sm text-neutral-600">
-                Click to upload or drag and drop
-              </p>
-              <p className="text-xs text-neutral-500">PDF, DOC up to 10MB</p>
-            </div>
-          </div>
-        </div>
+        <FileUpload
+          label="Resume/CV"
+          accept=".pdf,.doc,.docx"
+          required={true}
+          file={formData.documents.resume}
+          onFileChange={file => handleDocumentChange('resume', file)}
+          description="PDF, DOC up to 10MB"
+        />
 
-        <div>
-          <Label>Degree Certificate *</Label>
-          <div className="mt-2 flex items-center justify-center rounded-lg border-2 border-dashed border-neutral-300 p-6">
-            <div className="text-center">
-              <Upload className="mx-auto h-8 w-8 text-neutral-400" />
-              <p className="mt-2 text-sm text-neutral-600">
-                Click to upload or drag and drop
-              </p>
-              <p className="text-xs text-neutral-500">
-                PDF, JPG, PNG up to 10MB
-              </p>
-            </div>
-          </div>
-        </div>
+        <FileUpload
+          label="Degree Certificate"
+          accept=".pdf,.jpg,.jpeg,.png"
+          required={true}
+          file={formData.documents.degreeProof}
+          onFileChange={file => handleDocumentChange('degreeProof', file)}
+          description="PDF, JPG, PNG up to 10MB"
+        />
 
-        <div>
-          <Label>Experience Proof</Label>
-          <div className="mt-2 flex items-center justify-center rounded-lg border-2 border-dashed border-neutral-300 p-6">
-            <div className="text-center">
-              <Upload className="mx-auto h-8 w-8 text-neutral-400" />
-              <p className="mt-2 text-sm text-neutral-600">
-                Click to upload or drag and drop
-              </p>
-              <p className="text-xs text-neutral-500">
-                Work certificate, offer letter, etc.
-              </p>
-            </div>
-          </div>
-        </div>
+        <FileUpload
+          label="Experience Proof"
+          accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+          required={false}
+          file={formData.documents.experienceProof}
+          onFileChange={file => handleDocumentChange('experienceProof', file)}
+          description="Work certificate, offer letter, etc."
+        />
 
-        <div>
-          <Label>Government ID *</Label>
-          <div className="mt-2 flex items-center justify-center rounded-lg border-2 border-dashed border-neutral-300 p-6">
-            <div className="text-center">
-              <Upload className="mx-auto h-8 w-8 text-neutral-400" />
-              <p className="mt-2 text-sm text-neutral-600">
-                Click to upload or drag and drop
-              </p>
-              <p className="text-xs text-neutral-500">Aadhaar, PAN, Passport</p>
-            </div>
-          </div>
-        </div>
+        <FileUpload
+          label="Government ID"
+          accept=".pdf,.jpg,.jpeg,.png"
+          required={true}
+          file={formData.documents.idProof}
+          onFileChange={file => handleDocumentChange('idProof', file)}
+          description="Aadhaar, PAN, Passport"
+        />
       </div>
 
       <div className="space-y-4">
@@ -759,13 +1030,20 @@ export default function BecomeMentorPage() {
                   ) : (
                     <Button
                       onClick={handleSubmit}
-                      disabled={
-                        !formData.agreeToTerms || !formData.agreeToBackground
-                      }
+                      disabled={isSubmitting || !validateStep(4)}
                       className="bg-brand-600 hover:bg-brand-700"
                     >
-                      Submit Application
-                      <CheckCircle className="ml-2 h-4 w-4" />
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          Submit Application
+                          <CheckCircle className="ml-2 h-4 w-4" />
+                        </>
+                      )}
                     </Button>
                   )}
                 </div>
@@ -776,6 +1054,12 @@ export default function BecomeMentorPage() {
       </section>
 
       <Footer />
+
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+      />
     </div>
   )
 }
