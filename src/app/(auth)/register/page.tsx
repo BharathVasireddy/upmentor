@@ -93,7 +93,7 @@ export default function RegisterPage() {
   if (success) {
     return (
       <AuthOnlyRoute>
-        <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4 dark:bg-neutral-900">
+        <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4 py-6 dark:bg-neutral-900">
           <Card className="w-full max-w-md">
             <CardContent className="pt-6">
               <div className="text-center">
@@ -136,9 +136,9 @@ export default function RegisterPage() {
 
   return (
     <AuthOnlyRoute>
-      <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4 dark:bg-neutral-900">
+      <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4 py-6 dark:bg-neutral-900">
         <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1">
+          <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-center text-2xl font-bold">
               Create your account
             </CardTitle>
@@ -147,14 +147,14 @@ export default function RegisterPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
               {error && (
                 <div className="dark:bg-error-900/20 dark:text-error-400 border-error-200 dark:border-error-800 rounded-lg border bg-error-50 p-3 text-sm text-error-600">
                   {error}
                 </div>
               )}
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
                   id="name"
@@ -168,7 +168,7 @@ export default function RegisterPage() {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
@@ -182,7 +182,7 @@ export default function RegisterPage() {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <Input
@@ -210,7 +210,7 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <div className="relative">
                   <Input
@@ -238,19 +238,21 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  'Create account'
-                )}
-              </Button>
+              <div className="pt-2">
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating account...
+                    </>
+                  ) : (
+                    'Create account'
+                  )}
+                </Button>
+              </div>
             </form>
 
-            <div className="mt-6">
+            <div className="mt-4">
               <div className="text-center text-sm text-neutral-600 dark:text-neutral-400">
                 Already have an account?{' '}
                 <Link

@@ -61,14 +61,14 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4 dark:bg-neutral-900">
+    <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4 py-6 dark:bg-neutral-900">
       <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
+        <CardHeader className="space-y-1 pb-4">
           <CardTitle className="text-center text-2xl font-bold">
             Welcome back
           </CardTitle>
           <CardDescription className="text-center">
-            Enter your credentials to access your account
+            Sign in to your account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -133,7 +133,7 @@ function LoginForm() {
             </Button>
           </form>
 
-          <div className="mt-6 space-y-4">
+          <div className="mt-4 space-y-3">
             <div className="text-center">
               <Link
                 href="/forgot-password"
@@ -161,7 +161,7 @@ function LoginForm() {
 
 function LoginPageFallback() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4 dark:bg-neutral-900">
+    <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4 py-6 dark:bg-neutral-900">
       <Card className="w-full max-w-md">
         <CardContent className="pt-6">
           <div className="text-center">
