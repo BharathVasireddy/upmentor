@@ -507,16 +507,27 @@ export default function BecomeMentorPage() {
         }
       })
 
-      // TODO: Replace with actual API call
+      console.log('Submitting mentor application...')
+
       const response = await fetch('/api/mentors/apply', {
         method: 'POST',
         body: submitData,
       })
 
+      console.log('Response status:', response.status)
+
       if (response.ok) {
         setShowSuccessModal(true)
       } else {
-        throw new Error('Application submission failed')
+        const errorData = await response.json()
+
+        if (response.status === 409 && errorData.existingApplication) {
+          alert(
+            'You already have a mentor application on file. Please contact support at support@upmentor.com if you need to update your application.'
+          )
+        } else {
+          throw new Error(errorData.error || 'Application submission failed')
+        }
       }
     } catch (error) {
       console.error('Error submitting application:', error)

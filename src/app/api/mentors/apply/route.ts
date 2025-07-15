@@ -6,6 +6,7 @@ import { randomUUID } from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('Mentor application API called')
     const formData = await request.formData()
 
     // Extract form fields
@@ -72,17 +73,32 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if email already exists
-    const existingApplication = await prisma.user.findUnique({
+    // Check if email already exists and handle appropriately
+    console.log('Checking for existing user with email:', email)
+    const existingUser = await prisma.user.findUnique({
       where: { email },
+      include: {
+        mentor: true,
+      },
     })
 
-    if (existingApplication) {
+    console.log('Existing user found:', !!existingUser)
+    console.log('Existing mentor found:', !!existingUser?.mentor)
+
+    // If user exists and already has a mentor application
+    if (existingUser?.mentor) {
+      console.log('User already has mentor application, returning 409')
       return NextResponse.json(
-        { error: 'An application with this email already exists' },
+        {
+          error:
+            'A mentor application with this email already exists. Please contact support if you need to update your application.',
+          existingApplication: true,
+        },
         { status: 409 }
       )
     }
+
+    console.log('Proceeding with application creation...')
 
     // Create uploads directory
     const uploadsDir = join(
@@ -125,31 +141,51 @@ export async function POST(request: NextRequest) {
 
     // Create user and mentor application in database
     const result = await prisma.$transaction(async tx => {
-      // Create user first
-      const user = await tx.user.create({
-        data: {
-          email,
-          name: `${firstName} ${lastName}`,
-          passwordHash: '', // Will be set when they first login
-          phone,
-          profileImage: '',
-          dateOfBirth: new Date('1990-01-01'), // Placeholder
-          gender: 'Other',
-          city,
-          state,
-          country,
-          timezone: 'Asia/Kolkata',
-          primaryLanguage: languagesSpoken[0] || 'English',
-          languagesSpoken,
-          interests: [],
-          careerGoals: [],
-          preferredIndustries: [],
-          onboardingCompleted: false,
-          isVerified: false,
-          lastActive: new Date(),
-          accountStatus: 'ACTIVE', // Use valid enum value
-        },
-      })
+      let user
+
+      if (existingUser) {
+        // Update existing user with mentor application data
+        user = await tx.user.update({
+          where: { id: existingUser.id },
+          data: {
+            name: `${firstName} ${lastName}`,
+            phone,
+            city,
+            state,
+            country,
+            timezone: 'Asia/Kolkata',
+            primaryLanguage: languagesSpoken[0] || 'English',
+            languagesSpoken,
+            lastActive: new Date(),
+          },
+        })
+      } else {
+        // Create new user
+        user = await tx.user.create({
+          data: {
+            email,
+            name: `${firstName} ${lastName}`,
+            passwordHash: '', // Will be set when they first login
+            phone,
+            profileImage: '',
+            dateOfBirth: new Date('1990-01-01'), // Placeholder
+            gender: 'Other',
+            city,
+            state,
+            country,
+            timezone: 'Asia/Kolkata',
+            primaryLanguage: languagesSpoken[0] || 'English',
+            languagesSpoken,
+            interests: [],
+            careerGoals: [],
+            preferredIndustries: [],
+            onboardingCompleted: false,
+            isVerified: false,
+            lastActive: new Date(),
+            accountStatus: 'ACTIVE', // Use valid enum value
+          },
+        })
+      }
 
       // Create mentor application
       const mentor = await tx.mentor.create({
@@ -202,6 +238,8 @@ export async function POST(request: NextRequest) {
     // TODO: Send confirmation email to applicant
     // TODO: Send notification to admin team
     // TODO: Create calendar invite for interview if needed
+
+    console.log('Mentor application created successfully:', result.mentor.id)
 
     return NextResponse.json({
       success: true,
