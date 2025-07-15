@@ -2,12 +2,11 @@
 
 import { useEffect, ReactNode } from 'react'
 import { useSession } from 'next-auth/react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 interface AuthGuardProps {
   children: ReactNode
   requireAuth?: boolean
-  requireVerification?: boolean
   requireOnboarding?: boolean
   redirectTo?: string
 }
@@ -15,99 +14,54 @@ interface AuthGuardProps {
 export function AuthGuard({
   children,
   requireAuth = true,
-  requireVerification = true,
-  requireOnboarding = false,
-  redirectTo,
+  requireOnboarding = true,
+  redirectTo = '/login',
 }: AuthGuardProps) {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const pathname = usePathname()
 
   useEffect(() => {
     if (status === 'loading') return // Still loading
 
-    // If authentication is required but user is not authenticated
+    // Check authentication
     if (requireAuth && !session) {
-      const loginUrl = `/login?callbackUrl=${encodeURIComponent(pathname)}`
-      router.push(redirectTo || loginUrl)
+      router.push(redirectTo)
       return
     }
 
-    // If user is authenticated but shouldn't be (e.g., on login page)
-    if (!requireAuth && session) {
-      router.push(redirectTo || '/dashboard')
-      return
-    }
+    // Check onboarding completion
+    if (requireOnboarding && session?.user) {
+      // Type assertion to access our custom user properties
+      const user = session.user as any
 
-    // If email verification is required but user is not verified
-    if (
-      requireAuth &&
-      session &&
-      requireVerification &&
-      !session.user.isVerified
-    ) {
-      router.push('/verify-email')
-      return
+      // Check if user has completed onboarding
+      if (!user.onboardingCompleted) {
+        router.push('/onboarding/user-type')
+        return
+      }
     }
+  }, [session, status, router, requireAuth, requireOnboarding, redirectTo])
 
-    // If onboarding is required but user hasn't completed it
-    if (
-      requireAuth &&
-      session &&
-      requireOnboarding &&
-      !session.user.onboardingCompleted
-    ) {
-      router.push('/onboarding/academic-level')
-      return
-    }
-  }, [
-    session,
-    status,
-    requireAuth,
-    requireVerification,
-    requireOnboarding,
-    router,
-    pathname,
-    redirectTo,
-  ])
-
-  // Show loading spinner while session is loading
+  // Show loading state while checking auth
   if (status === 'loading') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-neutral-900">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-200 border-t-brand-600"></div>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-            Loading...
-          </p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
       </div>
     )
   }
 
-  // Show loading when redirecting
-  if (
-    (requireAuth && !session) ||
-    (!requireAuth && session) ||
-    (requireAuth &&
-      session &&
-      requireVerification &&
-      !session.user.isVerified) ||
-    (requireAuth &&
-      session &&
-      requireOnboarding &&
-      !session.user.onboardingCompleted)
-  ) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-neutral-900">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-200 border-t-brand-600"></div>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-            Redirecting...
-          </p>
-        </div>
-      </div>
-    )
+  // Don't render children if auth check fails
+  if (requireAuth && !session) {
+    return null
+  }
+
+  // Don't render children if onboarding required but not completed
+  if (requireOnboarding && session?.user) {
+    const user = session.user as any
+    if (!user.onboardingCompleted) {
+      return null
+    }
   }
 
   return <>{children}</>
@@ -116,7 +70,7 @@ export function AuthGuard({
 // Convenience components for common use cases
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   return (
-    <AuthGuard requireAuth={true} requireVerification={true}>
+    <AuthGuard requireAuth={true} requireOnboarding={true}>
       {children}
     </AuthGuard>
   )
@@ -128,11 +82,7 @@ export function AuthOnlyRoute({ children }: { children: ReactNode }) {
 
 export function DashboardRoute({ children }: { children: ReactNode }) {
   return (
-    <AuthGuard
-      requireAuth={true}
-      requireVerification={true}
-      requireOnboarding={true}
-    >
+    <AuthGuard requireAuth={true} requireOnboarding={true}>
       {children}
     </AuthGuard>
   )

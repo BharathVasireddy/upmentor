@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 
@@ -8,11 +10,17 @@ const completeOnboardingSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const validatedData = completeOnboardingSchema.parse(body)
+    const session = await getServerSession(authOptions)
 
-    // TODO: Get user ID from session/auth
-    const userId = 'mock-user-id' // Replace with actual user ID from auth
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const body = await request.text()
+    const parsedBody = body ? JSON.parse(body) : {}
+    const validatedData = completeOnboardingSchema.parse(parsedBody)
+
+    const userId = session.user.id
 
     // Update user to mark onboarding as completed
     const updatedUser = await prisma.user.update({

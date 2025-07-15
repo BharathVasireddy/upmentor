@@ -64,10 +64,8 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Invalid credentials')
         }
 
-        // Check if email is verified (optional - can be enforced based on requirements)
-        if (!user.isVerified) {
-          throw new Error('Please verify your email before signing in')
-        }
+        // Allow login but let middleware handle verification redirect
+        // This allows users to access the verify-email page if needed
 
         // Reset login attempts on successful login
         await resetLoginAttempts(user.id)

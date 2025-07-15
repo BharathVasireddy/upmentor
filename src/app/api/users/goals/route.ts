@@ -4,10 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
-const languagePreferencesSchema = z.object({
-  languagePreferences: z
-    .array(z.string())
-    .min(1, 'Please select at least one language'),
+const goalsSchema = z.object({
+  goals: z.array(z.string()).min(1, 'Please select at least one goal'),
 })
 
 export async function POST(req: NextRequest) {
@@ -19,15 +17,13 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    const validatedData = languagePreferencesSchema.parse(body)
+    const validatedData = goalsSchema.parse(body)
 
     const updatedUser = await prisma.user.update({
       where: { id: session.user.id },
       data: {
-        // Store language preferences in languagesSpoken field as JSON array
-        languagesSpoken: validatedData.languagePreferences,
-        // Set primary language as the first selected language
-        primaryLanguage: validatedData.languagePreferences[0],
+        // Store goals in careerGoals field as JSON array
+        careerGoals: validatedData.goals,
         updatedAt: new Date(),
       },
     })
@@ -36,22 +32,21 @@ export async function POST(req: NextRequest) {
       success: true,
       user: {
         id: updatedUser.id,
-        languagePreferences: updatedUser.languagesSpoken,
-        primaryLanguage: updatedUser.primaryLanguage,
+        goals: updatedUser.careerGoals,
       },
     })
   } catch (error) {
-    console.error('Error saving language preferences:', error)
+    console.error('Error saving user goals:', error)
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid language preferences data', details: error.issues },
+        { error: 'Invalid goals data', details: error.issues },
         { status: 400 }
       )
     }
 
     return NextResponse.json(
-      { error: 'Failed to save language preferences' },
+      { error: 'Failed to save user goals' },
       { status: 500 }
     )
   }
