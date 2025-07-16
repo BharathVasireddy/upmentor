@@ -219,7 +219,7 @@ export default function AnimatedStatsGrid({
         }, stat.delay)
       }
     })
-  }, [])
+  }, [stats])
 
   const formatValue = (stat: StatItem) => {
     if (typeof stat.value === 'number') {
