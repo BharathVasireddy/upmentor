@@ -109,6 +109,30 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL('/dashboard', req.url))
     }
 
+    // Role-based access control
+    const userRoles = token.roles || []
+
+    // Admin routes protection
+    if (pathname.startsWith('/admin')) {
+      if (!userRoles.includes('ADMIN')) {
+        return NextResponse.redirect(new URL('/dashboard', req.url))
+      }
+    }
+
+    // Support routes protection
+    if (pathname.startsWith('/support')) {
+      if (!userRoles.includes('SUPPORT') && !userRoles.includes('ADMIN')) {
+        return NextResponse.redirect(new URL('/dashboard', req.url))
+      }
+    }
+
+    // Mentor routes protection
+    if (pathname.startsWith('/mentor')) {
+      if (!userRoles.includes('MENTOR') && !userRoles.includes('ADMIN')) {
+        return NextResponse.redirect(new URL('/dashboard', req.url))
+      }
+    }
+
     return NextResponse.next()
   } catch (error) {
     console.error('Middleware error:', error)

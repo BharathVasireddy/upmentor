@@ -494,7 +494,7 @@ export default function BecomeMentorPage() {
       Object.entries(formData).forEach(([key, value]) => {
         if (key === 'documents') {
           Object.entries(value).forEach(([docKey, file]) => {
-            if (file) {
+            if (file && file instanceof File) {
               submitData.append(docKey, file)
             }
           })

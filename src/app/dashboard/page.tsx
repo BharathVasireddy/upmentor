@@ -5,32 +5,25 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import WelcomeHero from '@/components/dashboard/WelcomeHero'
+import AnimatedStatsGrid from '@/components/dashboard/AnimatedStatsGrid'
+import InteractiveActivityFeed from '@/components/dashboard/InteractiveActivityFeed'
+import FloatingActionPanel from '@/components/dashboard/FloatingActionPanel'
+import { getUserType, getMentorStatus } from '@/lib/auth-utils'
+import { BookOpen, GraduationCap, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import {
-  CheckCircle,
-  Clock,
-  AlertCircle,
-  BookOpen,
-  Users,
-  Calendar,
-  DollarSign,
-  Star,
-  TrendingUp,
-  Mail,
-  Phone,
-  Settings,
-  Bell,
-} from 'lucide-react'
 
 export default function DashboardPage() {
-  const { data: session, status } = useSession()
+  const { data: session, status, update } = useSession()
   const router = useRouter()
   const [userType, setUserType] = useState<
-    'student' | 'mentor' | 'pending' | null
+    'student' | 'mentor' | 'admin' | 'support' | null
   >(null)
-  const [dashboardData, setDashboardData] = useState<any>(null)
+  const [mentorStatus, setMentorStatus] = useState<
+    'pending' | 'approved' | 'rejected' | null
+  >(null)
+  const [viewMode, setViewMode] = useState<'mentor' | 'student'>('mentor')
+  const [sessionUpdated, setSessionUpdated] = useState(false)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -38,26 +31,46 @@ export default function DashboardPage() {
       return
     }
 
-    if (session?.user?.email) {
-      // TODO: Fetch user type and dashboard data from API
-      // For now, check if this is a new mentor application
-      const isNewMentor = window.location.search.includes('mentor=true')
-      if (isNewMentor) {
-        setUserType('pending')
-      } else {
-        setUserType('student') // Default for existing users
+    if (session?.user) {
+      const type = getUserType(session)
+      const mentorStatus = getMentorStatus(session)
+
+      setUserType(type)
+      setMentorStatus(mentorStatus)
+
+      // Auto-fix session if user has mentor verification status but no MENTOR role
+      if (
+        !sessionUpdated &&
+        session?.user?.mentorVerificationStatus &&
+        session?.user?.roles &&
+        !session.user.roles.includes('MENTOR')
+      ) {
+        setSessionUpdated(true)
+        update() // Force session refresh
       }
     }
-  }, [session, status, router])
+  }, [session, status, router, update, sessionUpdated])
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
         <Header />
-        <div className="flex items-center justify-center py-20">
-          <div className="text-center">
-            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-brand-200 border-t-brand-600"></div>
-            <p className="mt-4 text-neutral-600">Loading dashboard...</p>
+        <div className="flex min-h-[70vh] items-center justify-center px-4">
+          <div className="space-y-6 text-center">
+            {/* Animated loading circle */}
+            <div className="relative mx-auto h-20 w-20">
+              <div className="absolute inset-0 animate-pulse rounded-full border-4 border-purple-200"></div>
+              <div className="absolute inset-0 animate-spin rounded-full border-t-4 border-purple-600"></div>
+              <div className="absolute inset-4 animate-pulse rounded-full bg-gradient-to-br from-purple-400 to-pink-400"></div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-foreground">
+                Preparing your dashboard
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Crafting your personalized experience...
+              </p>
+            </div>
           </div>
         </div>
         <Footer />
@@ -65,282 +78,204 @@ export default function DashboardPage() {
     )
   }
 
-  const renderPendingMentorDashboard = () => (
-    <div className="space-y-6">
-      {/* Status Card */}
-      <Card className="border-amber-200 bg-amber-50">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <Clock className="h-6 w-6 text-amber-600" />
-            <div>
-              <CardTitle className="text-amber-900">
-                Application Under Review
-              </CardTitle>
-              <p className="text-sm text-amber-700">
-                Your mentor application is being processed
-              </p>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div>
-              <Badge variant="secondary" className="mb-2">
-                Status: Pending Review
-              </Badge>
-              <p className="text-sm text-amber-800">
-                Thank you for applying to become a mentor! Our team is currently
-                reviewing your application and documents. You can expect to hear
-                from us within 2-3 business days.
-              </p>
-            </div>
-
-            <div className="rounded-lg bg-white p-4">
-              <h4 className="mb-3 font-medium text-amber-900">
-                Application Timeline
-              </h4>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  <span className="text-sm">Application submitted</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Clock className="h-5 w-5 text-amber-600" />
-                  <span className="text-sm">
-                    Document verification (in progress)
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Clock className="h-5 w-5 text-neutral-400" />
-                  <span className="text-sm text-neutral-500">
-                    Background check
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Clock className="h-5 w-5 text-neutral-400" />
-                  <span className="text-sm text-neutral-500">
-                    Interview scheduling
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Clock className="h-5 w-5 text-neutral-400" />
-                  <span className="text-sm text-neutral-500">
-                    Final approval
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Next Steps */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
-            What to Expect
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <Mail className="mt-1 h-5 w-5 text-blue-600" />
-              <div>
-                <h4 className="font-medium">Email Confirmation</h4>
-                <p className="text-sm text-neutral-600">
-                  You'll receive an email confirmation once we begin reviewing
-                  your application.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <Phone className="mt-1 h-5 w-5 text-blue-600" />
-              <div>
-                <h4 className="font-medium">Interview Call</h4>
-                <p className="text-sm text-neutral-600">
-                  If your documents are approved, we'll schedule a brief
-                  interview call.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <BookOpen className="mt-1 h-5 w-5 text-blue-600" />
-              <div>
-                <h4 className="font-medium">Platform Training</h4>
-                <p className="text-sm text-neutral-600">
-                  Once approved, you'll receive training on how to use our
-                  mentoring platform.
-                </p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Contact Support */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Need Help?</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="mb-4 text-sm text-neutral-600">
-            Have questions about your application or the mentor program? We're
-            here to help!
-          </p>
-          <div className="flex gap-3">
-            <Button variant="outline" size="sm">
-              Contact Support
-            </Button>
-            <Button variant="outline" size="sm">
-              View FAQ
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
-
-  const renderStudentDashboard = () => (
-    <div className="space-y-6">
-      {/* Welcome Card */}
-      <Card className="border-brand-200 bg-brand-50">
-        <CardHeader>
-          <CardTitle className="text-brand-900">
-            Welcome back, {session?.user?.name || 'Student'}!
-          </CardTitle>
-          <p className="text-brand-700">
-            Continue your learning journey with expert mentors
-          </p>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-3">
-            <Button className="bg-brand-600 hover:bg-brand-700">
-              Find a Mentor
-            </Button>
-            <Button variant="outline">Complete Profile</Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="rounded-full bg-blue-100 p-3">
-                <BookOpen className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-neutral-600">Sessions Completed</p>
-                <p className="text-2xl font-bold">0</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="rounded-full bg-green-100 p-3">
-                <TrendingUp className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-neutral-600">Learning Progress</p>
-                <p className="text-2xl font-bold">0%</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="rounded-full bg-purple-100 p-3">
-                <Star className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm text-neutral-600">Average Rating</p>
-                <p className="text-2xl font-bold">-</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Upcoming Sessions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Upcoming Sessions
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="py-8 text-center">
-            <Calendar className="mx-auto mb-3 h-12 w-12 text-neutral-400" />
-            <p className="mb-4 text-neutral-600">
-              No upcoming sessions scheduled
-            </p>
-            <Button>Book Your First Session</Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Recommended Mentors */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Recommended Mentors
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="py-8 text-center">
-            <Users className="mx-auto mb-3 h-12 w-12 text-neutral-400" />
-            <p className="mb-4 text-neutral-600">
-              Complete your profile to get personalized mentor recommendations
-            </p>
-            <Button variant="outline">Complete Profile</Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
+  const currentUserType =
+    userType === 'mentor' && viewMode === 'student' ? 'student' : userType
+  const displayUserType = currentUserType || 'student'
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 antialiased">
       <Header />
 
-      <main className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-6xl">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-neutral-900">Dashboard</h1>
-            <p className="mt-2 text-neutral-600">
-              {userType === 'pending' && 'Track your mentor application status'}
-              {userType === 'student' && 'Manage your learning journey'}
-              {userType === 'mentor' && 'Manage your mentoring activities'}
-            </p>
+      <main className="container mx-auto px-4 py-8 lg:px-8">
+        <div className="mx-auto max-w-7xl space-y-8">
+          {/* Dashboard Header with View Switcher */}
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/10 p-2">
+                  <Sparkles className="h-6 w-6 text-purple-600" />
+                </div>
+                <h1 className="text-2xl font-bold text-foreground lg:text-3xl">
+                  Your Dashboard
+                </h1>
+              </div>
+              <p className="text-muted-foreground">
+                {displayUserType === 'mentor' &&
+                  'Inspire and guide the next generation'}
+                {displayUserType === 'student' &&
+                  'Your learning journey continues here'}
+                {displayUserType === 'admin' &&
+                  'Command center for platform excellence'}
+                {displayUserType === 'support' &&
+                  'Help users achieve their goals'}
+              </p>
+            </div>
+
+            {/* Enhanced View Switcher for Mentors */}
+            {userType === 'mentor' && (
+              <div className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/80 p-1.5 shadow-lg backdrop-blur-sm">
+                <Button
+                  variant={viewMode === 'mentor' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('mentor')}
+                  className={`rounded-xl transition-all duration-300 ${
+                    viewMode === 'mentor'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg'
+                      : 'text-muted-foreground hover:bg-white/50 hover:text-foreground'
+                  } `}
+                >
+                  <GraduationCap className="h-4 w-4" />
+                  Mentor Mode
+                </Button>
+                <Button
+                  variant={viewMode === 'student' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('student')}
+                  className={`rounded-xl transition-all duration-300 ${
+                    viewMode === 'student'
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                      : 'text-muted-foreground hover:bg-white/50 hover:text-foreground'
+                  } `}
+                >
+                  <BookOpen className="h-4 w-4" />
+                  Student Mode
+                </Button>
+              </div>
+            )}
           </div>
 
-          {/* Dashboard Content */}
-          {userType === 'pending' && renderPendingMentorDashboard()}
-          {userType === 'student' && renderStudentDashboard()}
-          {userType === 'mentor' && (
-            <div className="py-20 text-center">
-              <p>Mentor dashboard coming soon...</p>
-            </div>
-          )}
+          {/* Welcome Hero Section */}
+          <WelcomeHero
+            userType={displayUserType}
+            userName={session?.user?.name || ''}
+            mentorStatus={mentorStatus}
+          />
 
-          {!userType && (
-            <div className="py-20 text-center">
-              <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-brand-200 border-t-brand-600"></div>
-              <p className="mt-4 text-neutral-600">Loading your dashboard...</p>
+          {/* Animated Stats Grid */}
+          <AnimatedStatsGrid userType={displayUserType} />
+
+          {/* Interactive Activity Feed */}
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <InteractiveActivityFeed userType={displayUserType} />
             </div>
-          )}
+
+            {/* Quick Insights Sidebar */}
+            <div className="space-y-6">
+              {/* Quick Insights Card */}
+              <div className="relative overflow-hidden rounded-2xl border border-white/20 bg-white/50 p-6 backdrop-blur-sm">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5" />
+                <div className="relative space-y-4">
+                  <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                    <Sparkles className="h-5 w-5 text-purple-500" />
+                    Quick Insights
+                  </h3>
+
+                  <div className="space-y-3">
+                    {displayUserType === 'student' && (
+                      <>
+                        <div className="rounded-xl border border-blue-200/50 bg-blue-50 p-3">
+                          <p className="text-sm font-medium text-blue-800">
+                            Next Milestone
+                          </p>
+                          <p className="text-xs text-blue-600">
+                            Complete 3 more sessions to unlock "Consistent
+                            Learner" badge
+                          </p>
+                        </div>
+                        <div className="rounded-xl border border-emerald-200/50 bg-emerald-50 p-3">
+                          <p className="text-sm font-medium text-emerald-800">
+                            Trending Skill
+                          </p>
+                          <p className="text-xs text-emerald-600">
+                            React development is popular in your area
+                          </p>
+                        </div>
+                      </>
+                    )}
+
+                    {displayUserType === 'mentor' && (
+                      <>
+                        <div className="rounded-xl border border-purple-200/50 bg-purple-50 p-3">
+                          <p className="text-sm font-medium text-purple-800">
+                            Peak Hours
+                          </p>
+                          <p className="text-xs text-purple-600">
+                            Most bookings happen 6-8 PM on weekdays
+                          </p>
+                        </div>
+                        <div className="rounded-xl border border-amber-200/50 bg-amber-50 p-3">
+                          <p className="text-sm font-medium text-amber-800">
+                            Popular Topic
+                          </p>
+                          <p className="text-xs text-amber-600">
+                            Career guidance requests up 40% this month
+                          </p>
+                        </div>
+                      </>
+                    )}
+
+                    {displayUserType === 'admin' && (
+                      <>
+                        <div className="rounded-xl border border-red-200/50 bg-red-50 p-3">
+                          <p className="text-sm font-medium text-red-800">
+                            Action Required
+                          </p>
+                          <p className="text-xs text-red-600">
+                            12 mentor applications pending review
+                          </p>
+                        </div>
+                        <div className="rounded-xl border border-green-200/50 bg-green-50 p-3">
+                          <p className="text-sm font-medium text-green-800">
+                            System Health
+                          </p>
+                          <p className="text-xs text-green-600">
+                            All services running optimally
+                          </p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Achievement Preview */}
+              <div className="relative overflow-hidden rounded-2xl border border-amber-200/50 bg-gradient-to-br from-amber-50 to-orange-50 p-6">
+                <div className="space-y-4">
+                  <h3 className="flex items-center gap-2 text-lg font-semibold text-amber-800">
+                    🏆 Recent Achievement
+                  </h3>
+
+                  <div className="space-y-3 text-center">
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg">
+                      <span className="text-2xl">🔥</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-amber-800">
+                        {displayUserType === 'student'
+                          ? 'Learning Streak'
+                          : displayUserType === 'mentor'
+                            ? 'Top Rated'
+                            : 'Platform Growth'}
+                      </p>
+                      <p className="text-sm text-amber-600">
+                        {displayUserType === 'student'
+                          ? '7 days in a row!'
+                          : displayUserType === 'mentor'
+                            ? '4.9 stars this month'
+                            : '1000+ new users'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
+
+      {/* Floating Action Panel */}
+      <FloatingActionPanel userType={displayUserType} />
 
       <Footer />
     </div>

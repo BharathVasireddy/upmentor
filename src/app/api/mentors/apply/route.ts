@@ -215,6 +215,31 @@ export async function POST(request: NextRequest) {
         },
       })
 
+      // Assign MENTOR role to the user
+      await tx.userRole.upsert({
+        where: { userId: user.id },
+        update: {
+          roleType: 'MENTOR',
+          isActive: true,
+          assignedAt: new Date(),
+        },
+        create: {
+          userId: user.id,
+          roleType: 'MENTOR',
+          permissions: JSON.stringify([
+            'view_profile',
+            'manage_availability',
+            'view_sessions',
+            'manage_students',
+            'receive_payments',
+            'book_sessions', // Mentors can also book with other mentors
+            'view_mentors', // Mentors can browse other mentors
+          ]),
+          isActive: true,
+          assignedAt: new Date(),
+        },
+      })
+
       // Create mentor verification records
       const verificationPromises = Object.entries(documentUrls).map(
         ([docType, url]) =>

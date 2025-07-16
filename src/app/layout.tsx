@@ -16,9 +16,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="antialiased">
         <SessionProvider>
-          <OnboardingProvider>{children}</OnboardingProvider>
+          <OnboardingProvider>
+            <div className="min-h-screen bg-neutral-50">{children}</div>
+          </OnboardingProvider>
         </SessionProvider>
         <Toaster position="top-right" />
       </body>

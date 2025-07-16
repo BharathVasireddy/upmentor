@@ -8,6 +8,7 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { getDashboardUrl } from '@/lib/auth-utils'
 import {
   Card,
   CardContent,
@@ -50,7 +51,13 @@ function LoginForm() {
       if (result?.error) {
         setError(result.error)
       } else if (result?.ok) {
-        router.push(callbackUrl)
+        // Get the updated session to check user roles
+        const response = await fetch('/api/auth/session')
+        const session = await response.json()
+
+        // Use utility function to get appropriate dashboard URL
+        const dashboardUrl = getDashboardUrl(session)
+        router.push(dashboardUrl)
         router.refresh()
       }
     } catch (err) {

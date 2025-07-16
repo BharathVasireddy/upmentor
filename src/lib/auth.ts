@@ -169,11 +169,6 @@ export const authOptions: NextAuthOptions = {
         return url
       }
 
-      // For sign-in, default to dashboard if user is verified and onboarded
-      if (url.includes('signin') || url.includes('login')) {
-        return `${baseUrl}/dashboard`
-      }
-
       // For sign-out, go to home page
       if (url.includes('signout') || url.includes('logout')) {
         return baseUrl

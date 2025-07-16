@@ -1,6 +1,9 @@
 import { prisma } from './prisma'
 import { TokenType } from '@prisma/client'
 import crypto from 'crypto'
+import bcrypt from 'bcryptjs'
+import { RoleType, VerificationStatus } from '@prisma/client'
+import { Session } from 'next-auth'
 
 // Generate secure random token
 export function generateSecureToken(): string {
@@ -109,7 +112,7 @@ export async function cleanupExpiredTokens() {
   return result.count
 }
 
-// Check if user account is locked
+// Helper function to check if account is locked
 export async function isAccountLocked(userId: string): Promise<boolean> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -118,41 +121,44 @@ export async function isAccountLocked(userId: string): Promise<boolean> {
 
   if (!user?.lockedUntil) return false
 
-  return user.lockedUntil > new Date()
+  // Check if lock has expired
+  if (user.lockedUntil <= new Date()) {
+    // Clear the lock
+    await prisma.user.update({
+      where: { id: userId },
+      data: { lockedUntil: null, loginAttempts: 0 },
+    })
+    return false
+  }
+
+  return true
 }
 
-// Increment login attempts and lock account if necessary
-export async function handleFailedLogin(userId: string) {
+// Handle failed login attempts
+export async function handleFailedLogin(userId: string): Promise<void> {
+  const maxAttempts = 5
+  const lockDuration = 15 * 60 * 1000 // 15 minutes
+
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { loginAttempts: true },
   })
 
-  if (!user) return
-
-  const newAttempts = user.loginAttempts + 1
-  const maxAttempts = 5
-  const lockDurationMinutes = 15
-
-  let updateData: any = {
-    loginAttempts: newAttempts,
-  }
-
-  // Lock account if max attempts reached
-  if (newAttempts >= maxAttempts) {
-    updateData.lockedUntil = new Date(
-      Date.now() + lockDurationMinutes * 60 * 1000
-    )
-  }
+  const attempts = (user?.loginAttempts || 0) + 1
+  const lockUntil =
+    attempts >= maxAttempts ? new Date(Date.now() + lockDuration) : null
 
   await prisma.user.update({
     where: { id: userId },
-    data: updateData,
+    data: {
+      loginAttempts: attempts,
+      lockedUntil: lockUntil,
+    },
   })
 }
 
 // Reset login attempts on successful login
-export async function resetLoginAttempts(userId: string) {
+export async function resetLoginAttempts(userId: string): Promise<void> {
   await prisma.user.update({
     where: { id: userId },
     data: {
@@ -161,6 +167,95 @@ export async function resetLoginAttempts(userId: string) {
       lastActive: new Date(),
     },
   })
+}
+
+// Role checking utilities
+export function hasRole(session: Session | null, role: RoleType): boolean {
+  if (!session?.user?.roles) return false
+  return session.user.roles.includes(role)
+}
+
+export function hasAnyRole(
+  session: Session | null,
+  roles: RoleType[]
+): boolean {
+  if (!session?.user?.roles) return false
+  return roles.some(role => session.user.roles.includes(role))
+}
+
+export function isAdmin(session: Session | null): boolean {
+  return hasRole(session, 'ADMIN')
+}
+
+export function isMentor(session: Session | null): boolean {
+  return hasRole(session, 'MENTOR')
+}
+
+export function isStudent(session: Session | null): boolean {
+  return hasRole(session, 'STUDENT')
+}
+
+export function isSupport(session: Session | null): boolean {
+  return hasRole(session, 'SUPPORT')
+}
+
+export function isApprovedMentor(session: Session | null): boolean {
+  return (
+    hasRole(session, 'MENTOR') &&
+    session?.user?.mentorVerificationStatus === 'APPROVED'
+  )
+}
+
+export function isPendingMentor(session: Session | null): boolean {
+  return (
+    hasRole(session, 'MENTOR') &&
+    session?.user?.mentorVerificationStatus !== 'APPROVED'
+  )
+}
+
+// Get primary user type for display purposes
+export function getUserType(
+  session: Session | null
+): 'student' | 'mentor' | 'admin' | 'support' | null {
+  if (!session?.user?.roles) return null
+
+  const roles = session.user.roles
+
+  // Priority order: ADMIN > SUPPORT > MENTOR > STUDENT
+  if (roles.includes('ADMIN')) return 'admin'
+  if (roles.includes('SUPPORT')) return 'support'
+  if (roles.includes('MENTOR')) return 'mentor' // All mentors get mentor dashboard
+  return 'student' // Default for STUDENT role or no roles
+}
+
+// Get mentor verification status for display purposes
+export function getMentorStatus(
+  session: Session | null
+): 'pending' | 'approved' | 'rejected' | null {
+  if (!session?.user?.mentorVerificationStatus) return null
+
+  const status = session.user.mentorVerificationStatus
+
+  if (status === 'APPROVED') return 'approved'
+  if (status === 'REJECTED') return 'rejected'
+  return 'pending' // All other statuses are considered pending
+}
+
+// Get dashboard redirect URL based on user roles
+export function getDashboardUrl(session: Session | null): string {
+  const userType = getUserType(session)
+
+  switch (userType) {
+    case 'admin':
+      return '/admin/dashboard'
+    case 'support':
+      return '/support/dashboard'
+    case 'mentor':
+      return '/mentor/dashboard'
+    case 'student':
+    default:
+      return '/dashboard'
+  }
 }
 
 // Validate password strength
